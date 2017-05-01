@@ -1,5 +1,6 @@
 *.class
 *.log
+*.sc
 
 target
 project/project
@@ -8,4 +9,5 @@ project/target
 .classpath
 .project
 .settings
+.idea
 bin

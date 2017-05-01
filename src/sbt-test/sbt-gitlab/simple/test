@@ -1,1 +1,6 @@
-> show exampleTask
+# > listNamespaces
+
+> listProjects
+
+> listPipelines 2670739
+
