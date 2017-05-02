@@ -38,8 +38,8 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest"                % scalatestVersion % Test
 )
 
-bintrayPackageLabels := Seq("sbt", "plugin", "gitlab")
-bintrayVcsUrl := Some("""git@gitlab.com:kpmeen/sbt-gitlab.git""")
+//bintrayPackageLabels := Seq("sbt", "plugin", "gitlab")
+//bintrayVcsUrl := Some("""git@gitlab.com:kpmeen/sbt-gitlab.git""")
 
 initialCommands in console := """import net.scalytica.sbt._"""
 
