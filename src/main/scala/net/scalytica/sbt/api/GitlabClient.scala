@@ -1,11 +1,12 @@
 package net.scalytica.sbt.api
 
-import cats.syntax.either._
 import io.circe._
 import io.circe.parser._
 import net.scalytica.sbt.api.GitlabClient.TokenHeaderKey
 import net.scalytica.sbt.models.AccessToken
 import org.http4s._
+import org.http4s.dsl._
+import org.http4s.client._
 import org.http4s.circe._
 import org.http4s.client.asynchttpclient._
 
@@ -13,14 +14,18 @@ case class GitlabClient(token: AccessToken) {
 
   private val client = AsyncHttpClient()
 
-  private lazy val headers = Headers(Header(TokenHeaderKey, token.value))
+  private lazy val tokenHeader = Header(TokenHeaderKey, token.value)
 
-  private lazy val getRequest = (url: String) =>
-    Request(
-      method = Method.GET,
-      headers = headers,
-      uri = Uri.unsafeFromString(url)
-  )
+  private def getRequest(url: String) = {
+    GET(Uri.unsafeFromString(url)).putHeaders(tokenHeader)
+  }
+
+  private def postRequest[T](url: String, body: Option[T])(
+      implicit e: Encoder[T]
+  ) = {
+    POST(Uri.unsafeFromString(url), body.map(e.apply).getOrElse(Json.Null))
+      .putHeaders(tokenHeader)
+  }
 
   def get[T](url: String)(implicit decoder: Decoder[T]): T = {
     val request = getRequest(url)
@@ -43,6 +48,14 @@ case class GitlabClient(token: AccessToken) {
         }
       }
       .unsafePerformSync
+  }
+
+  def post[In, Out](url: String, body: Option[In])(
+      implicit encoder: Encoder[In],
+      decoder: Decoder[Out]
+  ): Out = {
+    val request = postRequest(url, body)
+    client.expect[Out](request)(jsonOf[Out]).unsafePerformSync
   }
 
 }

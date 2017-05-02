@@ -8,11 +8,12 @@ import net.scalytica.sbt.api.{
   Projects,
   UsersAndGroups
 }
-import net.scalytica.sbt.models.{AccessToken, Project, ProjectId}
+import net.scalytica.sbt.models.{AccessToken, PipelineId, Project, ProjectId}
 import sbt.Keys._
 import sbt._
 import sbt.plugins.JvmPlugin
 import complete.DefaultParsers._
+import sbt.complete.Parser
 import sbt.complete.Parser.token
 
 import scala.util.Properties
@@ -64,6 +65,10 @@ object SbtGitlabPlugin extends AutoPlugin {
 
     val listPipelines = inputKey[Unit]("Show pipelines for project.")
 
+    val retryPipelineJob = inputKey[Unit](
+      "Retry a pipline by specifying the projectId and the pipeline Id"
+    )
+
     val demo = inputKey[Unit]("A demo input task.")
   }
 
@@ -73,6 +78,8 @@ object SbtGitlabPlugin extends AutoPlugin {
 
   lazy val gitlabClient =
     Def.setting(GitlabClient(AccessToken(gitlabAuthToken.value)))
+
+  private val idParser = token(Space) ~> token(NatBasic, "<gitlab project id>")
 
   override lazy val projectSettings = {
     Seq(
@@ -127,17 +134,27 @@ object SbtGitlabPlugin extends AutoPlugin {
         }
       },
       listPipelines := {
-        val t               = (token(Space) ~> token(NatBasic, "<gitlab project id>")).parsed
+        val t               = idParser.parsed
         val pid             = ProjectId(t)
         val url             = gitlabBaseUrl.value
         val v               = gitlabApiVersion.value
         implicit val client = gitlabClient.value
 
-        println(pid)
-
         val p = Pipelines.list(url, pid, v)
 
         println(p.mkString("\n", "\n", "\n"))
+      },
+      retryPipelineJob := {
+        val (a, b)          = (idParser ~ idParser).parsed
+        val projId          = ProjectId(a)
+        val pipId           = PipelineId(b)
+        val url             = gitlabBaseUrl.value
+        val v               = gitlabApiVersion.value
+        implicit val client = gitlabClient.value
+
+        val p = Pipelines.retry(url, projId, pipId, v)
+
+        println(p)
       }
     )
   }

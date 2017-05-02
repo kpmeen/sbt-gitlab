@@ -1,7 +1,7 @@
 package net.scalytica.sbt.api
 
 import net.scalytica.sbt.api.APIVersions.APIVersion
-import net.scalytica.sbt.models.{Namespace, Project, ProjectId}
+import net.scalytica.sbt.models.{Namespace, PipelineId, Project, ProjectId}
 
 /*
   Security:
@@ -52,4 +52,8 @@ object Urls {
 
   lazy val PipelinesUrl = (b: String, p: ProjectId, v: APIVersion) =>
     s"${BaseUrl(b, v)}/projects/${p.value}/pipelines"
+
+  lazy val PipelineRetryUrl =
+    (b: String, p: ProjectId, pip: PipelineId, v: APIVersion) =>
+      s"${BaseUrl(b, v)}/projects/${p.value}/pipelines/${pip.value}/retry"
 }
