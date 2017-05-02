@@ -3,3 +3,7 @@
 > retryPipelineJob 7721678
 
 > showPipelineJob 7721678
+
+> cancelPipelineJob 7721678
+
+> showPipelineJob 7721678

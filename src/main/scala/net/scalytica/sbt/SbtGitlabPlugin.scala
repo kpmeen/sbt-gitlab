@@ -1,6 +1,5 @@
 package net.scalytica.sbt
 
-import io.circe.Printer
 import net.scalytica.sbt.api.APIVersions._
 import net.scalytica.sbt.api.{
   GitlabClient,
@@ -55,13 +54,13 @@ object SbtGitlabPlugin extends AutoPlugin {
 
   trait TaskKeys {
 
-    val listPipelines = inputKey[Unit]("Show pipelines for project.")
+    val listPipelines = inputKey[Unit]("Show pipelines for the project")
 
-    val showPipelineJob = inputKey[Unit]("Show pipeline job")
+    val showPipelineJob = inputKey[Unit]("Show a specific pipeline job")
 
-    val retryPipelineJob = inputKey[Unit](
-      "Retry a pipline by specifying the projectId and the pipeline Id"
-    )
+    val retryPipelineJob = inputKey[Unit]("Retry a specific pipeline")
+
+    val cancelPipelineJob = inputKey[Unit]("Cancel a running pipeline")
 
     val demo = inputKey[Unit]("A demo input task.")
   }
@@ -103,7 +102,9 @@ object SbtGitlabPlugin extends AutoPlugin {
           sys.error(
             "The Gitlab access token needs to be defined. Please see " +
               s"${gitlabBaseUrl.value}/profile/personal_access_tokens for more" +
-              s" details about how to create one."
+              s" details about how to create one. Then set the " +
+              s"${gitlabAuthToken.key.label} or the 'GITLAB_API_TOKEN' system " +
+              s"environment property"
           )
         }
       },
@@ -160,6 +161,23 @@ object SbtGitlabPlugin extends AutoPlugin {
 
         project.map { proj =>
           val p = Pipelines.retry(url, proj.id, pipId, v)
+          Pipeline.prettyPrint(Seq(p))
+        }.getOrElse {
+          log.warn(s"Could not find any project ${gitlabProjectName.value}")
+        }
+      },
+      cancelPipelineJob := {
+        val log             = streams.value.log
+        implicit val client = gitlabClient.value
+
+        val a       = idParser.parsed
+        val pipId   = PipelineId(a)
+        val project = gitlabProject.value
+        val url     = gitlabBaseUrl.value
+        val v       = gitlabApiVersion.value
+
+        project.map { proj =>
+          val p = Pipelines.cancel(url, proj.id, pipId, v)
           Pipeline.prettyPrint(Seq(p))
         }.getOrElse {
           log.warn(s"Could not find any project ${gitlabProjectName.value}")

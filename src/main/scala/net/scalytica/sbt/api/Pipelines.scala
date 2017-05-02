@@ -42,4 +42,18 @@ object Pipelines {
     )
   }
 
+  def cancel(
+      baseUrl: String,
+      projectId: ProjectId,
+      pipeLineId: PipelineId,
+      apiVersion: APIVersion
+  )(
+      implicit client: GitlabClient
+  ): Pipeline = {
+    client.post[Unit, Pipeline](
+      Urls.PipelineCancelUrl(baseUrl, projectId, pipeLineId, apiVersion),
+      None
+    )
+  }
+
 }
