@@ -15,6 +15,19 @@ object Pipelines {
     client.list[Pipeline](Urls.PipelinesUrl(baseUrl, projectId, apiVersion))
   }
 
+  def get(
+      baseUrl: String,
+      projectId: ProjectId,
+      pipeLineId: PipelineId,
+      apiVersion: APIVersion
+  )(
+      implicit client: GitlabClient
+  ): Pipeline = {
+    client.get[Pipeline](
+      Urls.GetPipelineUrl(baseUrl, projectId, pipeLineId, apiVersion)
+    )
+  }
+
   def retry(
       baseUrl: String,
       projectId: ProjectId,

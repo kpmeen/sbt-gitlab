@@ -8,13 +8,11 @@ import net.scalytica.sbt.api.{
   Projects,
   UsersAndGroups
 }
-import net.scalytica.sbt.models.{AccessToken, PipelineId, Project, ProjectId}
+import net.scalytica.sbt.models._
 import sbt.Keys._
 import sbt._
+import sbt.complete.DefaultParsers._
 import sbt.plugins.JvmPlugin
-import complete.DefaultParsers._
-import sbt.complete.Parser
-import sbt.complete.Parser.token
 
 import scala.util.Properties
 
@@ -56,14 +54,10 @@ object SbtGitlabPlugin extends AutoPlugin {
   }
 
   trait TaskKeys {
-    // Different tasks to execute
-    val listNamespaces =
-      taskKey[Unit]("Shows the namespaces you're associated with.")
-
-    val listProjects =
-      taskKey[Unit]("Show the projects for the given namespace.")
 
     val listPipelines = inputKey[Unit]("Show pipelines for project.")
+
+    val showPipelineJob = inputKey[Unit]("Show pipeline job")
 
     val retryPipelineJob = inputKey[Unit](
       "Retry a pipline by specifying the projectId and the pipeline Id"
@@ -78,6 +72,27 @@ object SbtGitlabPlugin extends AutoPlugin {
 
   lazy val gitlabClient =
     Def.setting(GitlabClient(AccessToken(gitlabAuthToken.value)))
+
+  lazy val gitlabProject: Def.Initialize[Option[GitlabProject]] =
+    Def.setting {
+      implicit val client = gitlabClient.value
+
+      val p = if (gitlabProjectOwnerIsUser.value) {
+        Projects.listForUser(gitlabBaseUrl.value, gitlabApiVersion.value)
+      } else {
+        UsersAndGroups
+          .listGroups(gitlabBaseUrl.value, gitlabApiVersion.value)
+          .find(_.path == gitlabProjectNamespace.value)
+          .map { n =>
+            Projects.listForGroup(
+              baseUrl = gitlabBaseUrl.value,
+              namespace = n
+            )
+          }
+          .getOrElse(Seq.empty)
+      }
+      p.find(_.name == gitlabProjectName.value)
+    }
 
   private val idParser = token(Space) ~> token(NatBasic, "<gitlab project id>")
 
@@ -101,60 +116,54 @@ object SbtGitlabPlugin extends AutoPlugin {
       gitlabApiVersion := V4,
       gitlabProjectOwnerIsUser := true,
       gitlabProjectName := name.value,
-      listNamespaces := {
+      listPipelines := {
+        val log             = streams.value.log
         implicit val client = gitlabClient.value
-        println(
-          UsersAndGroups
-            .listGroups(gitlabBaseUrl.value, gitlabApiVersion.value)
+
+        val project = gitlabProject.value
+        val url     = gitlabBaseUrl.value
+        val v       = gitlabApiVersion.value
+
+        project.map { proj =>
+          val p = Pipelines.list(url, proj.id, v)
+          Pipeline.prettyPrint(p)
+        }.getOrElse(
+          log.warn(s"Could not find any project ${gitlabProjectName.value}")
         )
       },
-      listProjects := {
+      showPipelineJob := {
+        val log             = streams.value.log
         implicit val client = gitlabClient.value
 
-        if (gitlabProjectOwnerIsUser.value) {
-          Project.prettyPrint(
-            Projects.listForUser(gitlabBaseUrl.value)
-          )
-        } else {
-          val res = UsersAndGroups
-            .listGroups(gitlabBaseUrl.value, gitlabApiVersion.value)
-            .find(_.path == gitlabProjectNamespace.value)
-            .map { n =>
-              Projects
-                .listForGroup(
-                  baseUrl = gitlabBaseUrl.value,
-                  namespace = n
-                )
-                .pretty(Printer.spaces2)
-            }
-            .getOrElse(
-              s"No projects found for ${gitlabProjectNamespace.value}"
-            )
-          println(res)
+        val a       = idParser.parsed
+        val pipId   = PipelineId(a)
+        val project = gitlabProject.value
+        val url     = gitlabBaseUrl.value
+        val v       = gitlabApiVersion.value
+
+        project.map { proj =>
+          val p = Pipelines.get(url, proj.id, pipId, v)
+          Pipeline.prettyPrint(Seq(p))
+        }.getOrElse {
+          log.warn(s"Could not find any project ${gitlabProjectName.value}")
         }
       },
-      listPipelines := {
-        val t               = idParser.parsed
-        val pid             = ProjectId(t)
-        val url             = gitlabBaseUrl.value
-        val v               = gitlabApiVersion.value
-        implicit val client = gitlabClient.value
-
-        val p = Pipelines.list(url, pid, v)
-
-        println(p.mkString("\n", "\n", "\n"))
-      },
       retryPipelineJob := {
-        val (a, b)          = (idParser ~ idParser).parsed
-        val projId          = ProjectId(a)
-        val pipId           = PipelineId(b)
-        val url             = gitlabBaseUrl.value
-        val v               = gitlabApiVersion.value
+        val log             = streams.value.log
         implicit val client = gitlabClient.value
 
-        val p = Pipelines.retry(url, projId, pipId, v)
+        val a       = idParser.parsed
+        val pipId   = PipelineId(a)
+        val project = gitlabProject.value
+        val url     = gitlabBaseUrl.value
+        val v       = gitlabApiVersion.value
 
-        println(p)
+        project.map { proj =>
+          val p = Pipelines.retry(url, proj.id, pipId, v)
+          Pipeline.prettyPrint(Seq(p))
+        }.getOrElse {
+          log.warn(s"Could not find any project ${gitlabProjectName.value}")
+        }
       }
     )
   }

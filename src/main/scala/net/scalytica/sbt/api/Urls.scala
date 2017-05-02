@@ -1,7 +1,7 @@
 package net.scalytica.sbt.api
 
 import net.scalytica.sbt.api.APIVersions.APIVersion
-import net.scalytica.sbt.models.{Namespace, PipelineId, Project, ProjectId}
+import net.scalytica.sbt.models.{Namespace, PipelineId, ProjectId}
 
 /*
   Security:
@@ -38,8 +38,11 @@ object Urls {
     s"${BaseUrl(b, v)}/namespaces"
 
   lazy val GroupProjectsUrl = (b: String, n: Namespace, v: APIVersion) =>
-    if (n.isGroup) Some(s"${BaseUrl(b, v)}/${n.kind}s/${n.id}/projects")
-    else None
+    if (n.isGroup) {
+      Some(s"${BaseUrl(b, v)}/${n.kind}s/${n.id}/projects?simple=true")
+    } else {
+      None
+  }
 
   lazy val UserProjectsUrl = (b: String, v: APIVersion) =>
     s"${BaseUrl(b, v)}/projects?membership=true&simple=true"
@@ -53,7 +56,15 @@ object Urls {
   lazy val PipelinesUrl = (b: String, p: ProjectId, v: APIVersion) =>
     s"${BaseUrl(b, v)}/projects/${p.value}/pipelines"
 
+  lazy val GetPipelineUrl =
+    (b: String, p: ProjectId, pip: PipelineId, v: APIVersion) =>
+      s"${BaseUrl(b, v)}/projects/${p.value}/pipelines/${pip.value}"
+
   lazy val PipelineRetryUrl =
     (b: String, p: ProjectId, pip: PipelineId, v: APIVersion) =>
       s"${BaseUrl(b, v)}/projects/${p.value}/pipelines/${pip.value}/retry"
+
+  lazy val PipelineCancelUrl =
+    (b: String, p: ProjectId, pip: PipelineId, v: APIVersion) =>
+      s"${BaseUrl(b, v)}/projects/${p.value}/pipelines/${pip.value}/cancel"
 }

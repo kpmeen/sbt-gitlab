@@ -16,12 +16,37 @@ import io.circe.generic.semiauto._
  * @see [[https://gitlab.com/help/api/pipelines.md#list-project-pipelines]]
  */
 case class Pipeline(
-    id: Int,
-    status: String,
+    id: PipelineId,
+    sha: String,
     ref: String,
-    sha: String
+    status: String
 )
 
 object Pipeline {
   implicit val decoder: Decoder[Pipeline] = deriveDecoder
+
+  private val (cols, idCols, statCols, refCols) = (60, 20, 25, 25)
+  private val header =
+    s"""--------------------------------------------------------------------------
+       ||  Pipeline Id       |  Status                 |  Ref/Branch             |
+       |--------------------------------------------------------------------------""".stripMargin
+
+  private val footer =
+    s"""--------------------------------------------------------------------------""".stripMargin
+
+  def prettyPrint(pips: Seq[Pipeline]): Unit = {
+    val rows = pips.map { p =>
+      val idStr   = s"|  ${p.id.value}"
+      val statStr = s"  ${p.status}"
+      val refStr  = s"  ${p.ref}"
+      val x       = (1 to idCols - idStr.length).map(_ => " ").mkString("") + "|"
+      val y       = (1 to statCols - statStr.length).map(_ => " ").mkString("") + "|"
+      val z       = (1 to refCols - refStr.length).map(_ => " ").mkString("") + "|"
+      idStr + x + statStr + y + refStr + z
+    }
+
+    val str = header + rows.mkString("\n", "\n", "\n") + footer
+    println(str)
+  }
+
 }

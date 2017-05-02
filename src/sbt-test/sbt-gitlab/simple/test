@@ -1,8 +1,5 @@
-# > listNamespaces
+> listPipelines
 
-> listProjects
+> retryPipelineJob 7721678
 
-> listPipelines 2670739
-
-> retryPipelineJob 2670739 7721678
-
+> showPipelineJob 7721678

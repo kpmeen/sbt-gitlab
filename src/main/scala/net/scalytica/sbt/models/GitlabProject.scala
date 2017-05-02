@@ -7,16 +7,18 @@ import io.circe._
  *
  * @see [[https://gitlab.com/help/api/projects.md#list-projects]]
  */
-case class Project(
+case class GitlabProject(
     id: ProjectId,
     name: String,
     path_with_namespace: String
 )
 
-object Project {
+object GitlabProject {
 
-  implicit val decoder: Decoder[Project] =
-    Decoder.forProduct3("id", "name", "path_with_namespace")(Project.apply)
+  implicit val decoder: Decoder[GitlabProject] =
+    Decoder.forProduct3("id", "name", "path_with_namespace")(
+      GitlabProject.apply
+    )
 
   private val (cols, idCols, noCols) = (60, 20, 38)
   private val header =
@@ -27,7 +29,7 @@ object Project {
   private val footer =
     s"""------------------------------------------------------------""".stripMargin
 
-  def prettyPrint(projs: Seq[Project]): Unit = {
+  def prettyPrint(projs: Seq[GitlabProject]): Unit = {
     val rows = projs.map { p =>
       val idStr = s"|  ${p.id.value}"
       val noStr = s"  ${p.name}"
