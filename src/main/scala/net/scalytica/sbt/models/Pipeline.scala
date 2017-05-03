@@ -38,9 +38,11 @@ object Pipeline {
       val idStr   = s"|  ${p.id.value}"
       val statStr = s"  ${p.status.prettyPrint}"
       val refStr  = s"  ${p.ref}"
-      val x       = (1 to idCols - idStr.length).map(_ => " ").mkString("") + "|"
-      val y       = (1 to statCols - statStr.length).map(_ => " ").mkString("") + "|"
-      val z       = (1 to refCols - refStr.length).map(_ => " ").mkString("") + "|"
+      val x       = (0 to idCols - idStr.length).map(_ => " ").mkString("") + "|"
+      val y = (1 to statCols - (statStr.length - 10))
+        .map(_ => " ")
+        .mkString("") + "|"
+      val z = (1 to refCols - refStr.length).map(_ => " ").mkString("") + "|"
       idStr + x + statStr + y + refStr + z
     }
 

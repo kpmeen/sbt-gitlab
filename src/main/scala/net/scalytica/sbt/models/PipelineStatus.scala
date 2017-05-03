@@ -1,6 +1,8 @@
 package net.scalytica.sbt.models
 
 import play.api.libs.json._
+import fansi.Color._
+import fansi.Str
 
 sealed trait PipelineStatus {
 
@@ -30,27 +32,23 @@ object PipelineStatus {
 }
 
 case object Success extends PipelineStatus {
-  override def prettyPrint =
-    fansi.Color.Green(PipelineStatus.SuccessStr).render
+  override def prettyPrint = Green(PipelineStatus.SuccessStr).render
 }
 
 case object Pending extends PipelineStatus {
-  override def prettyPrint =
-    fansi.Color.Yellow(PipelineStatus.PendingStr).render
+  override def prettyPrint = Yellow(PipelineStatus.PendingStr).render
 }
 
 case object Running extends PipelineStatus {
-  override def prettyPrint =
-    fansi.Color.LightBlue(PipelineStatus.RunningStr).render
+  override def prettyPrint = LightBlue(PipelineStatus.RunningStr).render
 }
 
 case object Canceled extends PipelineStatus {
-  override def prettyPrint =
-    fansi.Color.LightGray(PipelineStatus.CanceledStr).render
+  override def prettyPrint = DarkGray(PipelineStatus.CanceledStr).render
 }
 
 case object Failed extends PipelineStatus {
-  override def prettyPrint = fansi.Color.Red(PipelineStatus.FailedStr).render
+  override def prettyPrint = Red(PipelineStatus.FailedStr).render
 }
 
 case class Unknown(value: String) extends PipelineStatus {
