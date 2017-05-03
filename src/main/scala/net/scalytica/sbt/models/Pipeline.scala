@@ -18,7 +18,7 @@ case class Pipeline(
     id: PipelineId,
     sha: String,
     ref: String,
-    status: String
+    status: PipelineStatus
 )
 
 object Pipeline {
@@ -36,7 +36,7 @@ object Pipeline {
   def prettyPrint(pips: Seq[Pipeline]): Unit = {
     val rows = pips.map { p =>
       val idStr   = s"|  ${p.id.value}"
-      val statStr = s"  ${p.status}"
+      val statStr = s"  ${p.status.prettyPrint}"
       val refStr  = s"  ${p.ref}"
       val x       = (1 to idCols - idStr.length).map(_ => " ").mkString("") + "|"
       val y       = (1 to statCols - statStr.length).map(_ => " ").mkString("") + "|"

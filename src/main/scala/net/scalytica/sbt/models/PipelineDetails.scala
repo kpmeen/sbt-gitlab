@@ -7,7 +7,7 @@ import scala.concurrent.duration.FiniteDuration
 
 case class PipelineDetails(
     id: PipelineId,
-    status: String,
+    status: PipelineStatus,
     ref: String,
     tag: Boolean,
     user: GitlabUser,
@@ -27,7 +27,7 @@ object PipelineDetails {
 
   implicit val reader: Reads[PipelineDetails] = (
     (__ \ "id").read[PipelineId] and
-      (__ \ "status").read[String] and
+      (__ \ "status").read[PipelineStatus] and
       (__ \ "ref").read[String] and
       (__ \ "tag").read[Boolean] and
       (__ \ "user").read[GitlabUser] and
@@ -49,7 +49,7 @@ object PipelineDetails {
   def prettyPrint(p: PipelineDetails): Unit = {
     println(hf)
     println(s"pipeline ID : ${p.id}")
-    println(s"status      : ${p.status}")
+    println(s"status      : ${p.status.prettyPrint}")
     println(s"ref / branch: ${p.ref}")
     println(s"tag         : ${p.tag}")
     println(s"username    : ${p.user.name}")
