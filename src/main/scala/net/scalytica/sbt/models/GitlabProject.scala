@@ -1,6 +1,7 @@
 package net.scalytica.sbt.models
 
-import io.circe._
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 /**
  * Representation of a simple project model.
@@ -15,10 +16,11 @@ case class GitlabProject(
 
 object GitlabProject {
 
-  implicit val decoder: Decoder[GitlabProject] =
-    Decoder.forProduct3("id", "name", "path_with_namespace")(
-      GitlabProject.apply
-    )
+  implicit val decoder: Reads[GitlabProject] = (
+    (__ \ "id").read[ProjectId] and
+      (__ \ "name").read[String] and
+      (__ \ "path_with_namespace").read[String]
+  )(GitlabProject.apply _)
 
   private val (cols, idCols, noCols) = (60, 20, 38)
   private val header =

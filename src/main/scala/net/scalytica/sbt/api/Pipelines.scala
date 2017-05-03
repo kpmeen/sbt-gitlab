@@ -1,7 +1,12 @@
 package net.scalytica.sbt.api
 
 import net.scalytica.sbt.api.APIVersions.{APIVersion, V4}
-import net.scalytica.sbt.models.{Pipeline, PipelineId, ProjectId}
+import net.scalytica.sbt.models.{
+  Pipeline,
+  PipelineDetails,
+  PipelineId,
+  ProjectId
+}
 
 object Pipelines {
 
@@ -22,8 +27,8 @@ object Pipelines {
       apiVersion: APIVersion
   )(
       implicit client: GitlabClient
-  ): Pipeline = {
-    client.get[Pipeline](
+  ): PipelineDetails = {
+    client.get[PipelineDetails](
       Urls.GetPipelineUrl(baseUrl, projectId, pipeLineId, apiVersion)
     )
   }
@@ -36,9 +41,8 @@ object Pipelines {
   )(
       implicit client: GitlabClient
   ): Pipeline = {
-    client.post[Unit, Pipeline](
-      Urls.PipelineRetryUrl(baseUrl, projectId, pipeLineId, apiVersion),
-      None
+    client.postNoBody[Pipeline](
+      Urls.PipelineRetryUrl(baseUrl, projectId, pipeLineId, apiVersion)
     )
   }
 
@@ -50,9 +54,8 @@ object Pipelines {
   )(
       implicit client: GitlabClient
   ): Pipeline = {
-    client.post[Unit, Pipeline](
-      Urls.PipelineCancelUrl(baseUrl, projectId, pipeLineId, apiVersion),
-      None
+    client.postNoBody[Pipeline](
+      Urls.PipelineCancelUrl(baseUrl, projectId, pipeLineId, apiVersion)
     )
   }
 

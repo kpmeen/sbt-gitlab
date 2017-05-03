@@ -144,7 +144,7 @@ object SbtGitlabPlugin extends AutoPlugin {
 
         project.map { proj =>
           val p = Pipelines.get(url, proj.id, pipId, v)
-          Pipeline.prettyPrint(Seq(p))
+          PipelineDetails.prettyPrint(p)
         }.getOrElse {
           log.warn(s"Could not find any project ${gitlabProjectName.value}")
         }

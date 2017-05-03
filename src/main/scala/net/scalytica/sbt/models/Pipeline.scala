@@ -1,7 +1,6 @@
 package net.scalytica.sbt.models
 
-import io.circe._
-import io.circe.generic.semiauto._
+import play.api.libs.json._
 
 /*
   {
@@ -23,7 +22,7 @@ case class Pipeline(
 )
 
 object Pipeline {
-  implicit val decoder: Decoder[Pipeline] = deriveDecoder
+  implicit val decoder: Reads[Pipeline] = Json.reads[Pipeline]
 
   private val (cols, idCols, statCols, refCols) = (60, 20, 25, 25)
   private val header =

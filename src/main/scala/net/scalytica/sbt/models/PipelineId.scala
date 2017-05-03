@@ -1,10 +1,9 @@
 package net.scalytica.sbt.models
 
-import io.circe.Decoder
+import play.api.libs.json._
 
 case class PipelineId(value: Int) extends AnyVal
 
 case object PipelineId {
-  implicit val decoder: Decoder[PipelineId] =
-    Decoder.decodeInt.map(PipelineId.apply)
+  implicit val decoder: Reads[PipelineId] = __.read[Int].map(PipelineId.apply)
 }

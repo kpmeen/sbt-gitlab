@@ -24,18 +24,17 @@ scalacOptions ++= Seq(
 )
 
 val http4sVersion    = "0.15.9a"
-val circeVersion     = "0.6.1"
+val playJsonVersion  = "2.6.0-M7"
 val scalatestVersion = "3.0.1"
 
 libraryDependencies ++= Seq(
-  "org.http4s"    %% "http4s-async-http-client" % http4sVersion,
-  "org.http4s"    %% "http4s-dsl"               % http4sVersion,
-  "org.http4s"    %% "http4s-circe"             % http4sVersion,
-  "io.circe"      %% "circe-literal"            % circeVersion,
-  "io.circe"      %% "circe-parser"             % circeVersion,
-  "io.circe"      %% "circe-generic"            % circeVersion,
-  "org.scalactic" %% "scalactic"                % scalatestVersion % Test,
-  "org.scalatest" %% "scalatest"                % scalatestVersion % Test
+  "org.http4s"        %% "http4s-async-http-client" % http4sVersion,
+  "org.http4s"        %% "http4s-dsl"               % http4sVersion,
+  "com.typesafe.play" %% "play-json"                % playJsonVersion,
+  "joda-time"         % "joda-time"                 % "2.9.6" % Compile,
+  "org.joda"          % "joda-convert"              % "1.8.1" % Compile,
+  "org.scalactic"     %% "scalactic"                % scalatestVersion % Test,
+  "org.scalatest"     %% "scalatest"                % scalatestVersion % Test
 )
 
 //bintrayPackageLabels := Seq("sbt", "plugin", "gitlab")
