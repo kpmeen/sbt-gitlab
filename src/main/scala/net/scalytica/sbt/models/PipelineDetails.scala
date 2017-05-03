@@ -43,7 +43,23 @@ object PipelineDetails {
       (__ \ "coverage").readNullable[Double]
   )(PipelineDetails.apply _)
 
+  private val hf =
+    s"""----------------------------------------------------""".stripMargin
+
   def prettyPrint(p: PipelineDetails): Unit = {
-    println(p)
+    println(hf)
+    println(s"pipeline ID : ${p.id}")
+    println(s"status      : ${p.status}")
+    println(s"ref / branch: ${p.ref}")
+    println(s"tag         : ${p.tag}")
+    println(s"username    : ${p.user.name}")
+    println(s"created at  : ${p.createdAt}")
+    println(s"updated at  : ${p.updatedAt.getOrElse("-")}")
+    println(s"started at  : ${p.startedAt.getOrElse("-")}")
+    println(s"finished at : ${p.finishedAt.getOrElse("-")}")
+    println(s"committed at: ${p.committedAt.getOrElse("-")}")
+    println(s"duration    : ${p.duration.getOrElse("-")}")
+    println(s"coverage    : ${p.coverage.getOrElse("-")}")
+    println(hf)
   }
 }

@@ -7,7 +7,11 @@ import play.api.libs.json._
 
 import scala.util.Try
 
-case class Timestamp(zdt: ZonedDateTime)
+case class Timestamp(zdt: ZonedDateTime) {
+
+  override def toString: String = zdt.toString
+
+}
 
 object Timestamp {
 
