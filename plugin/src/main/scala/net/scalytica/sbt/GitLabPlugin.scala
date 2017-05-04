@@ -96,6 +96,28 @@ object GitLabPlugin extends AutoPlugin {
   private val idParser = token(Space) ~> token(NatBasic, "<gitlab project id>")
 
   override lazy val projectSettings = {
+
+    def printer[A](
+        f: (String, APIVersion, GitlabProject) => A
+    )(
+        p: A => Unit
+    ): Unit = Def.task {
+      val log     = streams.value.log
+      val project = gitlabProject.value
+      val url     = gitlabBaseUrl.value
+      val v       = gitlabApiVersion.value
+
+      project.map(proj => Right(f(url, v, proj))).getOrElse {
+        Left(
+          s"Could not find any project/repository called" +
+            s"${gitlabProjectNamespace.value} / ${gitlabProjectName.value}"
+        )
+      } match {
+        case Right(result) => p(result)
+        case Left(error)   => log.warn(error)
+      }
+    }
+
     Seq(
       gitlabAuthToken := {
         Properties.envOrNone("GITLAB_API_TOKEN").getOrElse {
@@ -118,97 +140,40 @@ object GitLabPlugin extends AutoPlugin {
       gitlabProjectOwnerIsUser := true,
       gitlabProjectName := name.value,
       listPipelines := {
-        val log             = streams.value.log
         implicit val client = gitlabClient.value
-
-        val project = gitlabProject.value
-        val url     = gitlabBaseUrl.value
-        val v       = gitlabApiVersion.value
-
-        val res =
-          project.map(p => Right(Pipelines.list(url, p.id, v))).getOrElse {
-            Left(
-              s"Could not find any project/repository called" +
-                s"${gitlabProjectNamespace.value} / ${gitlabProjectName.value}"
-            )
-          }
-
-        res match {
-          case Right(pipelines) => Pipeline.prettyPrint(pipelines)
-          case Left(err)        => log.warn(err)
-        }
+        printer((url, av, p) => Pipelines.list(url, p.id, av))(
+          Pipeline.prettyPrint
+        )
       },
       showPipeline := {
-        val log             = streams.value.log
         implicit val client = gitlabClient.value
 
-        val a       = idParser.parsed
-        val pipId   = PipelineId(a)
-        val project = gitlabProject.value
-        val url     = gitlabBaseUrl.value
-        val v       = gitlabApiVersion.value
+        val a     = idParser.parsed
+        val pipId = PipelineId(a)
 
-        val res = project
-          .map(p => Right(Pipelines.get(url, p.id, pipId, v)))
-          .getOrElse {
-            Left(
-              s"Could not find any project/repository called" +
-                s"${gitlabProjectNamespace.value} / ${gitlabProjectName.value}"
-            )
-          }
-
-        res match {
-          case Right(pipelines) => PipelineDetails.prettyPrint(pipelines)
-          case Left(err)        => log.warn(err)
-        }
+        printer((url, av, p) => Pipelines.get(url, p.id, pipId, av))(
+          PipelineDetails.prettyPrint
+        )
       },
       retryPipeline := {
-        val log             = streams.value.log
         implicit val client = gitlabClient.value
 
-        val a       = idParser.parsed
-        val pipId   = PipelineId(a)
-        val project = gitlabProject.value
-        val url     = gitlabBaseUrl.value
-        val v       = gitlabApiVersion.value
+        val a     = idParser.parsed
+        val pipId = PipelineId(a)
 
-        val res = project
-          .map(p => Right(Pipelines.retry(url, p.id, pipId, v)))
-          .getOrElse {
-            Left(
-              s"Could not find any project/repository called" +
-                s"${gitlabProjectNamespace.value} / ${gitlabProjectName.value}"
-            )
-          }
-
-        res match {
-          case Right(pipeline) => Pipeline.prettyPrint(pipeline)
-          case Left(err)       => log.warn(err)
-        }
+        printer((url, av, p) => Pipelines.retry(url, p.id, pipId, av))(
+          Pipeline.prettyPrint
+        )
       },
       cancelPipeline := {
-        val log             = streams.value.log
         implicit val client = gitlabClient.value
 
-        val a       = idParser.parsed
-        val pipId   = PipelineId(a)
-        val project = gitlabProject.value
-        val url     = gitlabBaseUrl.value
-        val v       = gitlabApiVersion.value
+        val a     = idParser.parsed
+        val pipId = PipelineId(a)
 
-        val res = project
-          .map(p => Right(Pipelines.cancel(url, p.id, pipId, v)))
-          .getOrElse {
-            Left(
-              s"Could not find any project/repository called" +
-                s"${gitlabProjectNamespace.value} / ${gitlabProjectName.value}"
-            )
-          }
-
-        res match {
-          case Right(pipeline) => Pipeline.prettyPrint(pipeline)
-          case Left(err)       => log.warn(err)
-        }
+        printer((url, av, p) => Pipelines.cancel(url, p.id, pipId, av))(
+          Pipeline.prettyPrint
+        )
       }
     )
   }
