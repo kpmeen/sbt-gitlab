@@ -2,6 +2,10 @@ import sbt._
 import Dependencies._
 import Publishing._
 
+licenses += "Apache-2.0" -> url(
+  "http://www.apache.org/licenses/LICENSE-2.0.html"
+)
+
 lazy val BaseSettings = Seq(
   organization := "net.scalytica",
   scalacOptions ++= Seq(
@@ -19,9 +23,6 @@ lazy val BaseSettings = Seq(
     "-language:higherKinds",
     "-language:existentials",
     "-language:postfixOps"
-  ),
-  licenses += "Apache-2.0" -> url(
-    "http://www.apache.org/licenses/LICENSE-2.0.html"
   )
 )
 
@@ -33,7 +34,7 @@ lazy val root = (project in file("."))
   .enablePlugins(CrossPerProjectPlugin)
 
 lazy val gitlabApi = (project in file("gitlab-api"))
-  .settings(PluginSettings: _*)
+  .settings(LibSettings: _*)
   .settings(
     name := """sbt-gitlab-api""",
     scalaVersion := "2.10.6",
@@ -46,7 +47,7 @@ lazy val gitlabApi = (project in file("gitlab-api"))
 
 lazy val plugin = (project in file("plugin"))
   .settings(ScriptedPlugin.scriptedSettings)
-  .settings(LibSettings: _*)
+  .settings(PluginSettings: _*)
   .settings(
     name := """sbt-gitlab""",
     sbtPlugin := true,
