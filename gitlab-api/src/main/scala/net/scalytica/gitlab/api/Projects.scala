@@ -9,7 +9,7 @@ object Projects {
       baseUrl: String,
       namespace: Namespace,
       apiVersion: APIVersion = V4
-  )(implicit client: GitlabClient) = {
+  )(implicit client: GitLabClient) = {
     Urls
       .GroupProjectsUrl(baseUrl, namespace, apiVersion)
       .map(url => client.list[GitlabProject](url))
@@ -19,7 +19,7 @@ object Projects {
   def listForUser(
       baseUrl: String,
       apiVersion: APIVersion = V4
-  )(implicit client: GitlabClient): Vector[GitlabProject] = {
+  )(implicit client: GitLabClient): Vector[GitlabProject] = {
     client.list[GitlabProject](Urls.UserProjectsUrl(baseUrl, apiVersion))
   }
 

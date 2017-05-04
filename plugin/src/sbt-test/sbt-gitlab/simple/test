@@ -1,9 +1,9 @@
 > listPipelines
 
-> retryPipelineJob 7721678
+> retryPipeline 7721678
 
-> showPipelineJob 7721678
+> showPipeline 7721678
 
-> cancelPipelineJob 7721678
+> cancelPipeline 7721678
 
-> showPipelineJob 7721678
+> showPipeline 7721678

@@ -33,6 +33,8 @@ object Pipeline {
   private val footer =
     s"""--------------------------------------------------------------------------""".stripMargin
 
+  def prettyPrint(pip: Pipeline): Unit = prettyPrint(Seq(pip))
+
   def prettyPrint(pips: Seq[Pipeline]): Unit = {
     val rows = pips.map { p =>
       val idStr   = s"|  ${p.id.value}"
