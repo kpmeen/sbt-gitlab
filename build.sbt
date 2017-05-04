@@ -32,18 +32,21 @@ lazy val root = (project in file("."))
   .aggregate(gitlabApi, plugin)
   .enablePlugins(CrossPerProjectPlugin)
 
-lazy val gitlabApi = (project in file("gitlab-api")).settings(
-  name := """sbt-gitlab-api""",
-  scalaVersion := "2.10.6",
-  crossScalaVersions ++= Seq("2.11.11", "2.12.2"),
-  libraryDependencies ++= Seq(fansi, playJson),
-  libraryDependencies ++= http4s,
-  libraryDependencies ++= joda,
-  libraryDependencies ++= scalaTest
-)
+lazy val gitlabApi = (project in file("gitlab-api"))
+  .settings(PluginSettings: _*)
+  .settings(
+    name := """sbt-gitlab-api""",
+    scalaVersion := "2.10.6",
+    crossScalaVersions ++= Seq("2.11.11", "2.12.2"),
+    libraryDependencies ++= Seq(fansi, playJson),
+    libraryDependencies ++= http4s,
+    libraryDependencies ++= joda,
+    libraryDependencies ++= scalaTest
+  )
 
 lazy val plugin = (project in file("plugin"))
   .settings(ScriptedPlugin.scriptedSettings)
+  .settings(LibSettings: _*)
   .settings(
     name := """sbt-gitlab""",
     sbtPlugin := true,

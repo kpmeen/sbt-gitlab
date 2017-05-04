@@ -2,6 +2,7 @@ import sbt._
 import sbt.Keys._
 import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
+import bintray.BintrayKeys._
 
 object Publishing {
 
@@ -12,6 +13,14 @@ object Publishing {
     publishLocal := (),
     publishArtifact := false,
     publishTo := None
+  )
+
+  val LibSettings = Seq(
+    bintrayPackage := "sbt-gitlab-api"
+  )
+
+  val PluginSettings = Seq(
+    bintrayPackage := "sbt-gitlab"
   )
 
   val PublishSettings = Seq(
@@ -34,7 +43,8 @@ object Publishing {
     },
     publishArtifact in Test := false,
     publishArtifact in (Compile, packageDoc) := true,
-    publishArtifact in (Compile, packageSrc) := true
+    publishArtifact in (Compile, packageSrc) := true,
+    bintrayRepository := "maven"
   )
 
   val ReleaseSettings = Seq(
