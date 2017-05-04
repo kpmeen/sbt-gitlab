@@ -10,4 +10,5 @@ project/target
 .project
 .settings
 .idea
+.DS_Store
 bin
