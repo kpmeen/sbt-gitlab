@@ -43,6 +43,7 @@ object Publishing {
     pomIncludeRepository := { _ =>
       false
     },
+    publishMavenStyle := true,
     publishArtifact in Test := false,
     publishArtifact in (Compile, packageDoc) := true,
     publishArtifact in (Compile, packageSrc) := true
