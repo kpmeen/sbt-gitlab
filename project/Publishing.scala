@@ -16,10 +16,12 @@ object Publishing {
   )
 
   val LibSettings = Seq(
+    bintrayRepository := "maven",
     bintrayPackage := "sbt-gitlab-api"
   )
 
   val PluginSettings = Seq(
+    bintrayRepository := "maven",
     bintrayPackage := "sbt-gitlab"
   )
 
@@ -43,8 +45,7 @@ object Publishing {
     },
     publishArtifact in Test := false,
     publishArtifact in (Compile, packageDoc) := true,
-    publishArtifact in (Compile, packageSrc) := true,
-    bintrayRepository := "maven"
+    publishArtifact in (Compile, packageSrc) := true
   )
 
   val ReleaseSettings = Seq(
