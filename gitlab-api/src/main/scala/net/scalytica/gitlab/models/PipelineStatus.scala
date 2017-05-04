@@ -2,7 +2,6 @@ package net.scalytica.gitlab.models
 
 import play.api.libs.json._
 import fansi.Color._
-import fansi.Str
 
 sealed trait PipelineStatus {
 
