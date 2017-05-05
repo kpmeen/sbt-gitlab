@@ -15,7 +15,7 @@ object Pipelines {
       projectId: ProjectId,
       apiVersion: APIVersion = V4
   )(
-      implicit client: GitlabClient
+      implicit client: GitLabClient
   ): Vector[Pipeline] = {
     client.list[Pipeline](Urls.PipelinesUrl(baseUrl, projectId, apiVersion))
   }
@@ -26,7 +26,7 @@ object Pipelines {
       pipeLineId: PipelineId,
       apiVersion: APIVersion
   )(
-      implicit client: GitlabClient
+      implicit client: GitLabClient
   ): PipelineDetails = {
     client.get[PipelineDetails](
       Urls.GetPipelineUrl(baseUrl, projectId, pipeLineId, apiVersion)
@@ -39,7 +39,7 @@ object Pipelines {
       pipeLineId: PipelineId,
       apiVersion: APIVersion
   )(
-      implicit client: GitlabClient
+      implicit client: GitLabClient
   ): Pipeline = {
     client.postNoBody[Pipeline](
       Urls.PipelineRetryUrl(baseUrl, projectId, pipeLineId, apiVersion)
@@ -52,7 +52,7 @@ object Pipelines {
       pipeLineId: PipelineId,
       apiVersion: APIVersion
   )(
-      implicit client: GitlabClient
+      implicit client: GitLabClient
   ): Pipeline = {
     client.postNoBody[Pipeline](
       Urls.PipelineCancelUrl(baseUrl, projectId, pipeLineId, apiVersion)

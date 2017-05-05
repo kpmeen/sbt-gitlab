@@ -1,23 +1,28 @@
+[ ![Download](https://api.bintray.com/packages/kpmeen/sbt-plugins/sbt-gitlab/images/download.svg) ](https://bintray.com/kpmeen/sbt-plugins/sbt-gitlab/_latestVersion)
+
 # sbt-gitlab
 
-SBT plugin for interacting with GitLab and GitLabCI.
+The main goal for this plugin is to allow users to interact with GitLab through
+their API's. All from the comfort of your favorite build tool.
+
 
 ## Usage
 
-This plugin requires sbt 0.13.5+
+For the time being it's necessary with a couple of additional steps to be able
+to use the plugin. First of all you need to add the following lines to your
+`project/plugins.sbt` file:
 
-### Testing
+```scala
+resolvers += Resolver.bintrayIvyRepo("kpmeen", "sbt-plugins")
+resolvers += Resolver.bintrayRepo("kpmeen", "maven")
 
-Run `test` for regular unit tests.
+addSbtPlugin("net.scalytica" % """sbt-gitlab""" % "0.1.2")
+```
 
-Run `scripted` for [sbt script tests](http://www.scala-sbt.org/0.13/docs/Testing-sbt-plugins.html).
+## Configuration
 
-### Publishing
+tbd...
 
-1. publish your source to GitHub
-2. [create a bintray account](https://bintray.com/signup/index) and [set up bintray credentials](https://github.com/sbt/sbt-bintray#publishing)
-3. create a bintray repository `sbt-plugins` 
-4. update your bintray publishing settings in `build.sbt`
-5. `sbt publish`
-6. [request inclusion in sbt-plugin-releases](https://bintray.com/sbt/sbt-plugin-releases)
-7. [Add your plugin to the community plugins list](https://github.com/sbt/website#attention-plugin-authors)
+## Tasks
+
+tbd...

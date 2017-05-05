@@ -1,6 +1,6 @@
 package net.scalytica.gitlab.api
 
-import net.scalytica.gitlab.api.GitlabClient.TokenHeaderKey
+import net.scalytica.gitlab.api.GitLabClient.TokenHeaderKey
 import net.scalytica.gitlab.models.AccessToken
 import org.http4s._
 import org.http4s.client._
@@ -10,7 +10,7 @@ import play.api.libs.json._
 
 import scalaz.concurrent.Task
 
-case class GitlabClient(token: AccessToken) {
+case class GitLabClient(token: AccessToken) {
 
   private val client = AsyncHttpClient()
 
@@ -79,7 +79,7 @@ case class GitlabClient(token: AccessToken) {
 
 }
 
-object GitlabClient {
+object GitLabClient {
 
   val TokenHeaderKey = "PRIVATE-TOKEN"
 

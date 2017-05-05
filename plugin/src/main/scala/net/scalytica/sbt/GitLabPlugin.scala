@@ -2,7 +2,7 @@ package net.scalytica.sbt
 
 import net.scalytica.gitlab.api.APIVersions._
 import net.scalytica.gitlab.api.{
-  GitlabClient,
+  GitLabClient,
   Pipelines,
   Projects,
   UsersAndGroups
@@ -15,7 +15,7 @@ import sbt.plugins.JvmPlugin
 
 import scala.util.Properties
 
-object SbtGitlabPlugin extends AutoPlugin {
+object GitLabPlugin extends AutoPlugin {
 
   override def trigger = allRequirements
 
@@ -34,7 +34,7 @@ object SbtGitlabPlugin extends AutoPlugin {
     val gitlabApiVersion = settingKey[APIVersion](
       "The API version to use. Defaults to v4."
     )
-    val gitlabBaseUrl = settingKey[String]("The base URL for the gitlab API.")
+    val gitlabBaseUrl = settingKey[String]("The base URL for the GitLab API.")
     val gitlabProjectNamespace = settingKey[String](
       "The GitLab namespace for this project. The namespace is typically the " +
         "name of the repos owner."
@@ -48,7 +48,7 @@ object SbtGitlabPlugin extends AutoPlugin {
     )
 
     val gitlabClient =
-      settingKey[GitlabClient]("HTTP Client used to communicate with gitlab")
+      settingKey[GitLabClient]("HTTP Client used to communicate with GitLab")
 
   }
 
@@ -56,11 +56,11 @@ object SbtGitlabPlugin extends AutoPlugin {
 
     val listPipelines = inputKey[Unit]("Show pipelines for the project")
 
-    val showPipelineJob = inputKey[Unit]("Show a specific pipeline job")
+    val showPipeline = inputKey[Unit]("Show a specific pipeline job")
 
-    val retryPipelineJob = inputKey[Unit]("Retry a specific pipeline")
+    val retryPipeline = inputKey[Unit]("Retry a specific pipeline")
 
-    val cancelPipelineJob = inputKey[Unit]("Cancel a running pipeline")
+    val cancelPipeline = inputKey[Unit]("Cancel a running pipeline")
 
     val demo = inputKey[Unit]("A demo input task.")
   }
@@ -70,7 +70,7 @@ object SbtGitlabPlugin extends AutoPlugin {
   import autoImport._
 
   lazy val gitlabClient =
-    Def.setting(GitlabClient(AccessToken(gitlabAuthToken.value)))
+    Def.setting(GitLabClient(AccessToken(gitlabAuthToken.value)))
 
   lazy val gitlabProject: Def.Initialize[Option[GitlabProject]] =
     Def.setting {
@@ -100,7 +100,7 @@ object SbtGitlabPlugin extends AutoPlugin {
       gitlabAuthToken := {
         Properties.envOrNone("GITLAB_API_TOKEN").getOrElse {
           sys.error(
-            "The Gitlab access token needs to be defined. Please see " +
+            "The GitLab access token needs to be defined. Please see " +
               s"${gitlabBaseUrl.value}/profile/personal_access_tokens for more" +
               s" details about how to create one. Then set the " +
               s"${gitlabAuthToken.key.label} or the 'GITLAB_API_TOKEN' system " +
@@ -125,31 +125,20 @@ object SbtGitlabPlugin extends AutoPlugin {
         val url     = gitlabBaseUrl.value
         val v       = gitlabApiVersion.value
 
-        project.map { proj =>
-          val p = Pipelines.list(url, proj.id, v)
-          Pipeline.prettyPrint(p)
-        }.getOrElse(
-          log.warn(s"Could not find any project ${gitlabProjectName.value}")
-        )
-      },
-      showPipelineJob := {
-        val log             = streams.value.log
-        implicit val client = gitlabClient.value
+        val res =
+          project.map(p => Right(Pipelines.list(url, p.id, v))).getOrElse {
+            Left(
+              s"Could not find any project/repository called" +
+                s"${gitlabProjectNamespace.value} / ${gitlabProjectName.value}"
+            )
+          }
 
-        val a       = idParser.parsed
-        val pipId   = PipelineId(a)
-        val project = gitlabProject.value
-        val url     = gitlabBaseUrl.value
-        val v       = gitlabApiVersion.value
-
-        project.map { proj =>
-          val p = Pipelines.get(url, proj.id, pipId, v)
-          PipelineDetails.prettyPrint(p)
-        }.getOrElse {
-          log.warn(s"Could not find any project ${gitlabProjectName.value}")
+        res match {
+          case Right(pipelines) => Pipeline.prettyPrint(pipelines)
+          case Left(err)        => log.warn(err)
         }
       },
-      retryPipelineJob := {
+      showPipeline := {
         val log             = streams.value.log
         implicit val client = gitlabClient.value
 
@@ -159,14 +148,21 @@ object SbtGitlabPlugin extends AutoPlugin {
         val url     = gitlabBaseUrl.value
         val v       = gitlabApiVersion.value
 
-        project.map { proj =>
-          val p = Pipelines.retry(url, proj.id, pipId, v)
-          Pipeline.prettyPrint(Seq(p))
-        }.getOrElse {
-          log.warn(s"Could not find any project ${gitlabProjectName.value}")
+        val res = project
+          .map(p => Right(Pipelines.get(url, p.id, pipId, v)))
+          .getOrElse {
+            Left(
+              s"Could not find any project/repository called" +
+                s"${gitlabProjectNamespace.value} / ${gitlabProjectName.value}"
+            )
+          }
+
+        res match {
+          case Right(pipelines) => PipelineDetails.prettyPrint(pipelines)
+          case Left(err)        => log.warn(err)
         }
       },
-      cancelPipelineJob := {
+      retryPipeline := {
         val log             = streams.value.log
         implicit val client = gitlabClient.value
 
@@ -176,11 +172,42 @@ object SbtGitlabPlugin extends AutoPlugin {
         val url     = gitlabBaseUrl.value
         val v       = gitlabApiVersion.value
 
-        project.map { proj =>
-          val p = Pipelines.cancel(url, proj.id, pipId, v)
-          Pipeline.prettyPrint(Seq(p))
-        }.getOrElse {
-          log.warn(s"Could not find any project ${gitlabProjectName.value}")
+        val res = project
+          .map(p => Right(Pipelines.retry(url, p.id, pipId, v)))
+          .getOrElse {
+            Left(
+              s"Could not find any project/repository called" +
+                s"${gitlabProjectNamespace.value} / ${gitlabProjectName.value}"
+            )
+          }
+
+        res match {
+          case Right(pipeline) => Pipeline.prettyPrint(pipeline)
+          case Left(err)       => log.warn(err)
+        }
+      },
+      cancelPipeline := {
+        val log             = streams.value.log
+        implicit val client = gitlabClient.value
+
+        val a       = idParser.parsed
+        val pipId   = PipelineId(a)
+        val project = gitlabProject.value
+        val url     = gitlabBaseUrl.value
+        val v       = gitlabApiVersion.value
+
+        val res = project
+          .map(p => Right(Pipelines.cancel(url, p.id, pipId, v)))
+          .getOrElse {
+            Left(
+              s"Could not find any project/repository called" +
+                s"${gitlabProjectNamespace.value} / ${gitlabProjectName.value}"
+            )
+          }
+
+        res match {
+          case Right(pipeline) => Pipeline.prettyPrint(pipeline)
+          case Left(err)       => log.warn(err)
         }
       }
     )

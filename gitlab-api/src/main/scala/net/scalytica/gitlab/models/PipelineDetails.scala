@@ -10,7 +10,7 @@ case class PipelineDetails(
     status: PipelineStatus,
     ref: String,
     tag: Boolean,
-    user: GitlabUser,
+    user: GitLabUser,
     sha: String,
     beforeSha: Option[String],
     yamlErrors: Option[String],
@@ -30,7 +30,7 @@ object PipelineDetails {
       (__ \ "status").read[PipelineStatus] and
       (__ \ "ref").read[String] and
       (__ \ "tag").read[Boolean] and
-      (__ \ "user").read[GitlabUser] and
+      (__ \ "user").read[GitLabUser] and
       (__ \ "sha").read[String] and
       (__ \ "before_sha").readNullable[String] and
       (__ \ "yaml_errors").readNullable[String] and

@@ -21,7 +21,7 @@ object Publishing {
   )
 
   val PluginSettings = Seq(
-    bintrayRepository := "maven",
+    bintrayRepository := "sbt-plugins",
     bintrayPackage := "sbt-gitlab"
   )
 
