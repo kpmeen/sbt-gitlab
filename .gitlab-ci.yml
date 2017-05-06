@@ -14,7 +14,8 @@ stages:
 test:
   stage: test
   script:
-    - mkdir -p $HOME/.bintray/.credentials
+    - mkdir -p $HOME/.bintray
+    - touch $HOME/.bintray/.credentials
     # Execute CI script
     - sbt clean scripted
     # Check if scalafmt modified any files during the build. If yes, fail the build.
