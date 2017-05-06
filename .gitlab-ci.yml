@@ -12,8 +12,9 @@ stages:
 test:
   stage: test
   script:
-    - mkdir -p $HOME/.bintray
-    - echo "realm = Bintray API Realm\nhost = api.bintray.com\nuser = fum\npassword = foobarbaz" > $HOME/.bintray/.credentials
+    - mkdir -p ~/.bintray
+    - echo "realm = Bintray API Realm\nhost = api.bintray.com\nuser = fum\npassword = foobarbaz\n" > ~/.bintray/.credentials
+    - cat ~/.bintray/.credentials
     # Execute CI script
     - sbt clean scripted
     # Check if scalafmt modified any files during the build. If yes, fail the build.
