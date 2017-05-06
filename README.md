@@ -1,3 +1,4 @@
+[![build status](https://gitlab.com/kpmeen/sbt-gitlab/badges/master/build.svg)](https://gitlab.com/kpmeen/sbt-gitlab/commits/master)
 [ ![Download](https://api.bintray.com/packages/kpmeen/sbt-plugins/sbt-gitlab/images/download.svg) ](https://bintray.com/kpmeen/sbt-plugins/sbt-gitlab/_latestVersion)
 
 # sbt-gitlab
