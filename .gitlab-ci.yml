@@ -13,7 +13,7 @@ test:
   stage: test
   script:
     - mkdir -p ~/.bintray
-    - echo "realm = Bintray API Realm\nhost = api.bintray.com\nuser = fum\npassword = foobarbaz\n" > ~/.bintray/.credentials
+    - cp project/.fake_creds ~/.bintray/.credentials
     - cat ~/.bintray/.credentials
     # Execute CI script
     - sbt clean scripted
