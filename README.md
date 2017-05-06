@@ -28,7 +28,7 @@ tbd...
 
 List executed pipelines for the configured project 
 ```
-sbt listPipelines
+listPipelines
 ```
 
 Retry a specific pipeline
