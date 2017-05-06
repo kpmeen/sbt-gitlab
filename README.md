@@ -25,4 +25,22 @@ tbd...
 
 ## Tasks
 
-tbd...
+List executed pipelines for the configured project 
+```
+sbt listPipelines
+```
+
+Retry a specific pipeline
+```
+retryPipeline <pipeline ID>
+```
+
+Show a specific pipeline
+```
+showPipeline  <pipeline ID>
+```
+
+Cancel an pipeline that is `pending` / `running`
+```
+cancelPipeline  <pipeline ID>
+```
