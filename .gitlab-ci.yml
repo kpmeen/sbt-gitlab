@@ -9,13 +9,11 @@ variables:
 stages:
   - test
 
-
-
 test:
   stage: test
   script:
     - mkdir -p $HOME/.bintray
-    - touch $HOME/.bintray/.credentials
+    - echo "realm = fi\nhost = fa\nuser = fum\npassword = foobarbaz" > $HOME/.bintray/.credentials
     # Execute CI script
     - sbt clean scripted
     # Check if scalafmt modified any files during the build. If yes, fail the build.
