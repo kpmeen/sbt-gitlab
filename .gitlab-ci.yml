@@ -1,0 +1,18 @@
+######################################################################
+# GitLab CI build script for the Symbiotic project                   #
+######################################################################
+image: kpmeen/docker-scala-sbt
+
+variables:
+  DOCKER_DRIVER: overlay
+
+stages:
+  - test
+
+test:
+  stage: test
+  script:
+    # Execute CI script
+    - sbt clean scripted
+    # Check if scalafmt modified any files during the build. If yes, fail the build.
+    - git diff --exit-code || (echo "ERROR code formatting check failed, see differences below."; false)
