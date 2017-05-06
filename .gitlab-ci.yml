@@ -13,8 +13,10 @@ test:
   stage: test
   script:
     - mkdir -p ~/.bintray
-    - cp project/.fake_creds ~/.bintray/.credentials
-    - cat ~/.bintray/.credentials
+    - echo "realm = fi" >> /root/.bintray/.credentials
+    - echo "host = fa" >> /root/.bintray/.credentials
+    - echo "user = fum" >> /root/.bintray/.credentials
+    - echo "password = foobarbaz" >> /root/.bintray/.credentials
     # Execute CI script
     - sbt clean scripted
     # Check if scalafmt modified any files during the build. If yes, fail the build.
