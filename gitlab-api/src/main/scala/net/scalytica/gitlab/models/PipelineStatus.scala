@@ -1,11 +1,13 @@
 package net.scalytica.gitlab.models
 
-import play.api.libs.json._
 import fansi.Color._
+import play.api.libs.json._
 
 sealed trait PipelineStatus {
 
   def prettyPrint: String
+
+  override def toString = prettyPrint
 
 }
 
@@ -32,24 +34,36 @@ object PipelineStatus {
 
 case object Success extends PipelineStatus {
   override def prettyPrint = Green(PipelineStatus.SuccessStr).render
+
+  override def toString = prettyPrint
 }
 
 case object Pending extends PipelineStatus {
   override def prettyPrint = Yellow(PipelineStatus.PendingStr).render
+
+  override def toString = prettyPrint
 }
 
 case object Running extends PipelineStatus {
   override def prettyPrint = LightBlue(PipelineStatus.RunningStr).render
+
+  override def toString = prettyPrint
 }
 
 case object Canceled extends PipelineStatus {
   override def prettyPrint = DarkGray(PipelineStatus.CanceledStr).render
+
+  override def toString = prettyPrint
 }
 
 case object Failed extends PipelineStatus {
   override def prettyPrint = Red(PipelineStatus.FailedStr).render
+
+  override def toString = prettyPrint
 }
 
 case class Unknown(value: String) extends PipelineStatus {
   override def prettyPrint = value
+
+  override def toString = prettyPrint
 }
