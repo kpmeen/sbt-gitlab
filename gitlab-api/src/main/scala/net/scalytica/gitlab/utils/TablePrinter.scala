@@ -28,8 +28,7 @@ object TablePrinter {
               }
             }
           val colSizes = cellSizes.transpose.map(_.max)
-          println(colSizes.mkString(", "))
-          val rows = t.map(r => formatRow(r, colSizes))
+          val rows     = t.map(r => formatRow(r, colSizes))
 
           formatRows(rowSeparator(colSizes), rows)
       }
