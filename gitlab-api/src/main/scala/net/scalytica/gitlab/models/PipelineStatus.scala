@@ -1,11 +1,15 @@
 package net.scalytica.gitlab.models
 
-import play.api.libs.json._
 import fansi.Color._
+import play.api.libs.json._
 
 sealed trait PipelineStatus {
 
-  def prettyPrint: String
+  val color: fansi.EscapeAttr
+
+  def prettyPrint: fansi.Str = color(plainPrint)
+
+  def plainPrint: String
 
 }
 
@@ -31,25 +35,37 @@ object PipelineStatus {
 }
 
 case object Success extends PipelineStatus {
-  override def prettyPrint = Green(PipelineStatus.SuccessStr).render
+  override val color      = Green
+  override def plainPrint = PipelineStatus.SuccessStr
+  override def toString   = prettyPrint.render
 }
 
 case object Pending extends PipelineStatus {
-  override def prettyPrint = Yellow(PipelineStatus.PendingStr).render
+  override val color      = Yellow
+  override def plainPrint = PipelineStatus.PendingStr
+  override def toString   = prettyPrint.render
 }
 
 case object Running extends PipelineStatus {
-  override def prettyPrint = LightBlue(PipelineStatus.RunningStr).render
+  override val color      = LightBlue
+  override def plainPrint = PipelineStatus.RunningStr
+  override def toString   = prettyPrint.render
 }
 
 case object Canceled extends PipelineStatus {
-  override def prettyPrint = DarkGray(PipelineStatus.CanceledStr).render
+  override val color      = DarkGray
+  override def plainPrint = PipelineStatus.CanceledStr
+  override def toString   = prettyPrint.render
 }
 
 case object Failed extends PipelineStatus {
-  override def prettyPrint = Red(PipelineStatus.FailedStr).render
+  override val color      = Red
+  override def plainPrint = PipelineStatus.FailedStr
+  override def toString   = prettyPrint.render
 }
 
 case class Unknown(value: String) extends PipelineStatus {
-  override def prettyPrint = value
+  override val color      = White
+  override def plainPrint = value
+  override def toString   = prettyPrint.render
 }

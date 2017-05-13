@@ -1,5 +1,6 @@
 package net.scalytica.gitlab.models
 
+import net.scalytica.gitlab.utils.TablePrinter
 import play.api.libs.json._
 
 /*
@@ -24,32 +25,15 @@ case class Pipeline(
 object Pipeline {
   implicit val decoder: Reads[Pipeline] = Json.reads[Pipeline]
 
-  private val (cols, idCols, statCols, refCols) = (60, 20, 25, 25)
-  private val header =
-    s"""--------------------------------------------------------------------------
-       ||  Pipeline Id       |  Status                 |  Ref/Branch             |
-       |--------------------------------------------------------------------------""".stripMargin
-
-  private val footer =
-    s"""--------------------------------------------------------------------------""".stripMargin
+  private val headers = Seq("Pipeline Id", "Status", "Ref/Branch")
 
   def prettyPrint(pip: Pipeline): Unit = prettyPrint(Seq(pip))
 
   def prettyPrint(pips: Seq[Pipeline]): Unit = {
-    val rows = pips.map { p =>
-      val idStr   = s"|  ${p.id.value}"
-      val statStr = s"  ${p.status.prettyPrint}"
-      val refStr  = s"  ${p.ref}"
-      val x       = (0 to idCols - idStr.length).map(_ => " ").mkString("") + "|"
-      val y = (1 to statCols - (statStr.length - 10))
-        .map(_ => " ")
-        .mkString("") + "|"
-      val z = (1 to refCols - refStr.length).map(_ => " ").mkString("") + "|"
-      idStr + x + statStr + y + refStr + z
-    }
-
-    val str = header + rows.mkString("\n", "\n", "\n") + footer
-    println(str)
+    val tab = TablePrinter.format(Seq(headers) ++ pips.map { p =>
+      Seq(p.id.value, p.status.prettyPrint, p.ref)
+    })
+    println(tab)
   }
 
 }
