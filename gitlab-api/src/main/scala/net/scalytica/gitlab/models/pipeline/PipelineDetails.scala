@@ -1,7 +1,12 @@
-package net.scalytica.gitlab.models
+package net.scalytica.gitlab.models.pipeline
 
-import play.api.libs.json._
+import net.scalytica.gitlab.models.{
+  GitLabUser,
+  Timestamp,
+  finiteDurationDecoder
+}
 import play.api.libs.functional.syntax._
+import play.api.libs.json._
 
 import scala.concurrent.duration.FiniteDuration
 

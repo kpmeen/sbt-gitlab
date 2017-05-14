@@ -1,6 +1,6 @@
 package net.scalytica.gitlab.utils
 
-import net.scalytica.gitlab.models.Pipeline
+import net.scalytica.gitlab.models.pipeline.Pipeline
 import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json._
 

@@ -1,7 +1,8 @@
 package net.scalytica.gitlab.api
 
 import net.scalytica.gitlab.api.APIVersions.APIVersion
-import net.scalytica.gitlab.models.{Namespace, PipelineId, ProjectId}
+import net.scalytica.gitlab.models.pipeline.PipelineId
+import net.scalytica.gitlab.models.{Namespace, ProjectId}
 
 /*
   Security:

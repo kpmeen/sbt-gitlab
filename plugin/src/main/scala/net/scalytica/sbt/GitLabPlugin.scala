@@ -8,6 +8,11 @@ import net.scalytica.gitlab.api.{
   UsersAndGroups
 }
 import net.scalytica.gitlab.models._
+import net.scalytica.gitlab.models.pipeline.{
+  Pipeline,
+  PipelineDetails,
+  PipelineId
+}
 import sbt.Keys._
 import sbt._
 import sbt.complete.DefaultParsers._

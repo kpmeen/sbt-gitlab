@@ -1,16 +1,7 @@
-package net.scalytica.gitlab.models
+package net.scalytica.gitlab.models.pipeline
 
 import net.scalytica.gitlab.utils.TablePrinter
 import play.api.libs.json._
-
-/*
-  {
-    "id": 47,
-    "status": "pending",
-    "ref": "new-pipeline",
-    "sha": "a91957a858320c0e17f3a0eca7cfacbff50ea29a"
-  }
- */
 
 /**
  * @see [[https://gitlab.com/help/api/pipelines.md#list-project-pipelines]]

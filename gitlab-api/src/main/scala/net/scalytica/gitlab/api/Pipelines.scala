@@ -1,12 +1,12 @@
 package net.scalytica.gitlab.api
 
 import net.scalytica.gitlab.api.APIVersions.{APIVersion, V4}
-import net.scalytica.gitlab.models.{
+import net.scalytica.gitlab.models.pipeline.{
   Pipeline,
   PipelineDetails,
-  PipelineId,
-  ProjectId
+  PipelineId
 }
+import net.scalytica.gitlab.models.ProjectId
 
 object Pipelines {
 

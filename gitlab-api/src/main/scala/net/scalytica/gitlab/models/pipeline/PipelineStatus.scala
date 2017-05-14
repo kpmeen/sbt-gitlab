@@ -1,4 +1,4 @@
-package net.scalytica.gitlab.models
+package net.scalytica.gitlab.models.pipeline
 
 import fansi.Color._
 import play.api.libs.json._
