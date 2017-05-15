@@ -1,6 +1,7 @@
 package net.scalytica.gitlab.api
 
 import net.scalytica.gitlab.api.APIVersions.APIVersion
+import net.scalytica.gitlab.models.mergerequest.MergeRequestId
 import net.scalytica.gitlab.models.pipeline.PipelineId
 import net.scalytica.gitlab.models.{Namespace, ProjectId}
 
@@ -33,7 +34,7 @@ import net.scalytica.gitlab.models.{Namespace, ProjectId}
 
 object Urls {
 
-  lazy val BaseUrl = (b: String, v: APIVersion) => s"$b/api/${v.version}"
+  lazy val BaseUrl = (b: String, v: APIVersion) => s"$b/api/$v"
 
   lazy val NamespacesUrl = (b: String, v: APIVersion) =>
     s"${BaseUrl(b, v)}/namespaces"
@@ -51,21 +52,25 @@ object Urls {
   lazy val UserByNameUrl = (b: String, n: Namespace, v: APIVersion) =>
     s"${BaseUrl(b, v)}/users?username=${n.path}"
 
-  lazy val MergeRequestsUrl = (b: String, p: ProjectId, v: APIVersion) =>
-    s"${BaseUrl(b, v)}/projects/$p/merge_requests?state=opened"
-
   lazy val PipelinesUrl = (b: String, p: ProjectId, v: APIVersion) =>
-    s"${BaseUrl(b, v)}/projects/${p.value}/pipelines"
+    s"${BaseUrl(b, v)}/projects/$p/pipelines"
 
   lazy val GetPipelineUrl =
     (b: String, p: ProjectId, pip: PipelineId, v: APIVersion) =>
-      s"${BaseUrl(b, v)}/projects/${p.value}/pipelines/${pip.value}"
+      s"${BaseUrl(b, v)}/projects/$p/pipelines/$pip"
 
   lazy val PipelineRetryUrl =
     (b: String, p: ProjectId, pip: PipelineId, v: APIVersion) =>
-      s"${BaseUrl(b, v)}/projects/${p.value}/pipelines/${pip.value}/retry"
+      s"${BaseUrl(b, v)}/projects/$p/pipelines/$pip/retry"
 
   lazy val PipelineCancelUrl =
     (b: String, p: ProjectId, pip: PipelineId, v: APIVersion) =>
-      s"${BaseUrl(b, v)}/projects/${p.value}/pipelines/${pip.value}/cancel"
+      s"${BaseUrl(b, v)}/projects/$p/pipelines/$pip/cancel"
+
+  lazy val MergeRequestsUrl = (b: String, p: ProjectId, v: APIVersion) =>
+    s"${BaseUrl(b, v)}/projects/$p/merge_requests"
+
+  lazy val GetMergeRequestUrl =
+    (b: String, p: ProjectId, m: MergeRequestId, v: APIVersion) =>
+      s"${BaseUrl(b, v)}/projects/$p/merge_requests/$m"
 }

@@ -7,3 +7,7 @@
 > cancelPipeline 8088990
 
 > showPipeline 8088990
+
+> listMergeRequests
+
+> showMergeRequest 2
