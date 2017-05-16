@@ -1,0 +1,11 @@
+# > listPipelines
+# > retryPipeline 8088990
+# > showPipeline 8088990
+# > cancelPipeline 8088990
+# > showPipeline 8088990
+# > listMergeRequests
+# > listMergeRequests Opened
+# > showMergeRequest 2
+
+> listMergeRequestNotes 1
+

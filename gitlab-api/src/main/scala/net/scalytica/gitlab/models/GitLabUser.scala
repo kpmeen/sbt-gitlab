@@ -5,20 +5,22 @@ import play.api.libs.json._
 
 case class GitLabUser(
     id: UserId,
-    name: String,
-    state: String,
     username: Username,
-    webUrl: String
+    email: Option[Email],
+    name: Option[String],
+    state: Option[String],
+    webUrl: Option[String]
 )
 
 object GitLabUser {
 
-  implicit val decoder: Reads[GitLabUser] = (
+  implicit val reads: Reads[GitLabUser] = (
     (__ \ "id").read[UserId] and
-      (__ \ "name").read[String] and
-      (__ \ "state").read[String] and
       (__ \ "username").read[Username] and
-      (__ \ "web_url").read[String]
+      (__ \ "email").readNullable[Email] and
+      (__ \ "name").readNullable[String] and
+      (__ \ "state").readNullable[String] and
+      (__ \ "web_url").readNullable[String]
   )(GitLabUser.apply _)
 
 }

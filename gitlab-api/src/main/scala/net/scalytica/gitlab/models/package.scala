@@ -7,7 +7,7 @@ import scala.concurrent.duration.FiniteDuration
 
 package object models {
 
-  implicit val finiteDurationDecoder: Reads[FiniteDuration] =
+  implicit val finiteDurationReads: Reads[FiniteDuration] =
     __.read[Long].map(i => FiniteDuration(i, duration.SECONDS))
 
 }

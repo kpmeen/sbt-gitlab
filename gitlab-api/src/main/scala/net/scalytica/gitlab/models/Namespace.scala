@@ -12,7 +12,7 @@ object NamespaceKinds {
     private[this] val UserNS  = "user"
     private[this] val GroupNS = "group"
 
-    implicit val decoder: Reads[NamespaceKind] = Reads { js =>
+    implicit val reads: Reads[NamespaceKind] = Reads { js =>
       js.validate[String] match {
         case JsSuccess(v, _) if v == UserNS  => JsSuccess(UserKind)
         case JsSuccess(v, _) if v == GroupNS => JsSuccess(GroupKind)
@@ -46,5 +46,5 @@ case class Namespace(
 }
 
 object Namespace {
-  implicit val decoder: Reads[Namespace] = Json.reads[Namespace]
+  implicit val reads: Reads[Namespace] = Json.reads[Namespace]
 }

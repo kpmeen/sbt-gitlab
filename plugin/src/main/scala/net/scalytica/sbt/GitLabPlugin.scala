@@ -1,13 +1,10 @@
 package net.scalytica.sbt
 
 import net.scalytica.gitlab.api.APIVersions._
-import net.scalytica.gitlab.api.{
-  GitLabClient,
-  Pipelines,
-  Projects,
-  UsersAndGroups
-}
+import net.scalytica.gitlab.api._
 import net.scalytica.gitlab.models._
+import net.scalytica.gitlab.models.mergerequest._
+import net.scalytica.gitlab.models.note.Note
 import net.scalytica.gitlab.models.pipeline.{
   Pipeline,
   PipelineDetails,
@@ -59,15 +56,15 @@ object GitLabPlugin extends AutoPlugin {
 
   trait TaskKeys {
 
-    val listPipelines = inputKey[Unit]("Show pipelines for the project")
+    val listPipelines     = taskKey[Unit]("Show test for the project")
+    val showPipeline      = inputKey[Unit]("Show a specific pipeline job")
+    val retryPipeline     = inputKey[Unit]("Retry a specific pipeline")
+    val cancelPipeline    = inputKey[Unit]("Cancel a running pipeline")
+    val listMergeRequests = inputKey[Unit]("List merge requests")
+    val showMergeRequest  = inputKey[Unit]("Show a specific merge request")
+    val listMergeRequestNotes =
+      inputKey[Unit]("Show notes/comments for a specific merge request")
 
-    val showPipeline = inputKey[Unit]("Show a specific pipeline job")
-
-    val retryPipeline = inputKey[Unit]("Retry a specific pipeline")
-
-    val cancelPipeline = inputKey[Unit]("Cancel a running pipeline")
-
-    val demo = inputKey[Unit]("A demo input task.")
   }
 
   object autoImport extends SettingKeys with TaskKeys
@@ -99,6 +96,20 @@ object GitLabPlugin extends AutoPlugin {
     }
 
   private val idParser = token(Space) ~> token(NatBasic, "<gitlab project id>")
+
+  private val mrStateParser =
+    sbt.complete.Parser
+      .opt(
+        token(Space) ~> token(
+          StringBasic,
+          s"<${MergeState.All.map(_.value).mkString(" | ")}>"
+        )
+      )
+      .map(_.map(MergeState.unsafeFromString))
+
+  private val projectNotFound = (namespace: String) =>
+    (name: String) =>
+      s"Could not find any project/repository called $namespace / $name"
 
   override lazy val projectSettings = {
     Seq(
@@ -133,8 +144,9 @@ object GitLabPlugin extends AutoPlugin {
         val res =
           project.map(p => Right(Pipelines.list(url, p.id, v))).getOrElse {
             Left(
-              s"Could not find any project/repository called" +
-                s"${gitlabProjectNamespace.value} / ${gitlabProjectName.value}"
+              projectNotFound(gitlabProjectNamespace.value)(
+                gitlabProjectName.value
+              )
             )
           }
 
@@ -157,8 +169,9 @@ object GitLabPlugin extends AutoPlugin {
           .map(p => Right(Pipelines.get(url, p.id, pipId, v)))
           .getOrElse {
             Left(
-              s"Could not find any project/repository called" +
-                s"${gitlabProjectNamespace.value} / ${gitlabProjectName.value}"
+              projectNotFound(gitlabProjectNamespace.value)(
+                gitlabProjectName.value
+              )
             )
           }
 
@@ -181,8 +194,9 @@ object GitLabPlugin extends AutoPlugin {
           .map(p => Right(Pipelines.retry(url, p.id, pipId, v)))
           .getOrElse {
             Left(
-              s"Could not find any project/repository called" +
-                s"${gitlabProjectNamespace.value} / ${gitlabProjectName.value}"
+              projectNotFound(gitlabProjectNamespace.value)(
+                gitlabProjectName.value
+              )
             )
           }
 
@@ -195,8 +209,8 @@ object GitLabPlugin extends AutoPlugin {
         val log             = streams.value.log
         implicit val client = gitlabClient.value
 
-        val a       = idParser.parsed
-        val pipId   = PipelineId(a)
+        val id      = idParser.parsed
+        val pipId   = PipelineId(id)
         val project = gitlabProject.value
         val url     = gitlabBaseUrl.value
         val v       = gitlabApiVersion.value
@@ -205,14 +219,92 @@ object GitLabPlugin extends AutoPlugin {
           .map(p => Right(Pipelines.cancel(url, p.id, pipId, v)))
           .getOrElse {
             Left(
-              s"Could not find any project/repository called" +
-                s"${gitlabProjectNamespace.value} / ${gitlabProjectName.value}"
+              projectNotFound(gitlabProjectNamespace.value)(
+                gitlabProjectName.value
+              )
             )
           }
 
         res match {
           case Right(pipeline) => Pipeline.prettyPrint(pipeline)
           case Left(err)       => log.warn(err)
+        }
+      },
+      listMergeRequests := {
+        val log             = streams.value.log
+        implicit val client = gitlabClient.value
+
+        val state   = mrStateParser.parsed.getOrElse(NoState)
+        val project = gitlabProject.value
+        val url     = gitlabBaseUrl.value
+        val v       = gitlabApiVersion.value
+
+        val res =
+          project
+            .map(p => Right(MergeRequests.list(url, p.id, v, state)))
+            .getOrElse {
+              Left(
+                projectNotFound(gitlabProjectNamespace.value)(
+                  gitlabProjectName.value
+                )
+              )
+            }
+
+        res match {
+          case Right(mergeRequests) => MergeRequest.prettyPrint(mergeRequests)
+          case Left(err)            => log.warn(err)
+        }
+      },
+      showMergeRequest := {
+        val log             = streams.value.log
+        implicit val client = gitlabClient.value
+
+        val id      = idParser.parsed
+        val mrId    = MergeRequestId(id)
+        val project = gitlabProject.value
+        val url     = gitlabBaseUrl.value
+        val v       = gitlabApiVersion.value
+
+        val res =
+          project
+            .map(p => Right(MergeRequests.get(url, p.id, mrId, v)))
+            .getOrElse {
+              Left(
+                projectNotFound(gitlabProjectNamespace.value)(
+                  gitlabProjectName.value
+                )
+              )
+            }
+
+        res match {
+          case Right(mergeRequests) => MergeRequest.prettyPrint(mergeRequests)
+          case Left(err)            => log.warn(err)
+        }
+      },
+      listMergeRequestNotes := {
+        val log             = streams.value.log
+        implicit val client = gitlabClient.value
+
+        val id      = idParser.parsed
+        val mrId    = MergeRequestId(id)
+        val project = gitlabProject.value
+        val url     = gitlabBaseUrl.value
+        val v       = gitlabApiVersion.value
+
+        val res =
+          project
+            .map(p => Right(MergeRequests.notes(url, p.id, mrId, v)))
+            .getOrElse {
+              Left(
+                projectNotFound(gitlabProjectNamespace.value)(
+                  gitlabProjectName.value
+                )
+              )
+            }
+
+        res match {
+          case Right(notes) => Note.prettyPrint(notes)
+          case Left(err)    => log.warn(err)
         }
       }
     )

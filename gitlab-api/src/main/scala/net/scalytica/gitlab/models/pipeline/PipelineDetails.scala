@@ -1,9 +1,11 @@
 package net.scalytica.gitlab.models.pipeline
 
 import net.scalytica.gitlab.models.{
+  Branch,
+  CommitSha,
   GitLabUser,
   Timestamp,
-  finiteDurationDecoder
+  finiteDurationReads
 }
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -13,11 +15,11 @@ import scala.concurrent.duration.FiniteDuration
 case class PipelineDetails(
     id: PipelineId,
     status: PipelineStatus,
-    ref: String,
+    ref: Branch,
     tag: Boolean,
     user: GitLabUser,
-    sha: String,
-    beforeSha: Option[String],
+    sha: CommitSha,
+    beforeSha: Option[CommitSha],
     yamlErrors: Option[String],
     createdAt: Timestamp,
     updatedAt: Option[Timestamp],
@@ -30,14 +32,14 @@ case class PipelineDetails(
 
 object PipelineDetails {
 
-  implicit val reader: Reads[PipelineDetails] = (
+  implicit val reads: Reads[PipelineDetails] = (
     (__ \ "id").read[PipelineId] and
       (__ \ "status").read[PipelineStatus] and
-      (__ \ "ref").read[String] and
+      (__ \ "ref").read[Branch] and
       (__ \ "tag").read[Boolean] and
       (__ \ "user").read[GitLabUser] and
-      (__ \ "sha").read[String] and
-      (__ \ "before_sha").readNullable[String] and
+      (__ \ "sha").read[CommitSha] and
+      (__ \ "before_sha").readNullable[CommitSha] and
       (__ \ "yaml_errors").readNullable[String] and
       (__ \ "created_at").read[Timestamp] and
       (__ \ "updated_at").readNullable[Timestamp] and
@@ -52,19 +54,24 @@ object PipelineDetails {
     s"""----------------------------------------------------""".stripMargin
 
   def prettyPrint(p: PipelineDetails): Unit = {
-    println(hf)
-    println(s"pipeline ID : ${p.id}")
-    println(s"status      : ${p.status.prettyPrint}")
-    println(s"ref / branch: ${p.ref}")
-    println(s"tag         : ${p.tag}")
-    println(s"username    : ${p.user.name}")
-    println(s"created at  : ${p.createdAt}")
-    println(s"updated at  : ${p.updatedAt.getOrElse("-")}")
-    println(s"started at  : ${p.startedAt.getOrElse("-")}")
-    println(s"finished at : ${p.finishedAt.getOrElse("-")}")
-    println(s"committed at: ${p.committedAt.getOrElse("-")}")
-    println(s"duration    : ${p.duration.getOrElse("-")}")
-    println(s"coverage    : ${p.coverage.getOrElse("-")}")
-    println(hf)
+    val out =
+      s"""
+         |$hf
+         |pipeline id : ${p.id}
+         |status      : ${p.status.prettyPrint}
+         |ref / branch: ${p.ref}
+         |tag         : ${p.tag}
+         |username    : ${p.user.username}
+         |created at  : ${p.createdAt}
+         |updated at  : ${p.updatedAt.getOrElse("-")}
+         |started at  : ${p.startedAt.getOrElse("-")}
+         |finished at : ${p.finishedAt.getOrElse("-")}
+         |committed at: ${p.committedAt.getOrElse("-")}
+         |duration    : ${p.duration.getOrElse("-")}
+         |coverage    : ${p.coverage.getOrElse("-")}
+         |$hf
+       """.stripMargin
+
+    println(out)
   }
 }
