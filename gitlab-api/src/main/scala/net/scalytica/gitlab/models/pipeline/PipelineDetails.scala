@@ -50,13 +50,10 @@ object PipelineDetails {
       (__ \ "coverage").readNullable[Double]
   )(PipelineDetails.apply _)
 
-  private val hf =
-    s"""----------------------------------------------------""".stripMargin
-
   def prettyPrint(p: PipelineDetails): Unit = {
     val out =
       s"""
-         |$hf
+         |------------------- PIPELINE -----------------------
          |pipeline id : ${p.id}
          |status      : ${p.status.prettyPrint}
          |ref / branch: ${p.ref}
@@ -69,7 +66,7 @@ object PipelineDetails {
          |committed at: ${p.committedAt.getOrElse("-")}
          |duration    : ${p.duration.getOrElse("-")}
          |coverage    : ${p.coverage.getOrElse("-")}
-         |$hf
+         |----------------------------------------------------
        """.stripMargin
 
     println(out)

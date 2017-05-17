@@ -2,6 +2,7 @@ package net.scalytica.gitlab.api
 
 import net.scalytica.gitlab.api.APIVersions.APIVersion
 import net.scalytica.gitlab.models.mergerequest.{MergeRequestId, MergeState}
+import net.scalytica.gitlab.models.note.NoteId
 import net.scalytica.gitlab.models.pipeline.PipelineId
 import net.scalytica.gitlab.models.{Namespace, ProjectId}
 
@@ -75,7 +76,11 @@ object Urls {
     (b: String, p: ProjectId, m: MergeRequestId, v: APIVersion) =>
       s"${BaseUrl(b, v)}/projects/$p/merge_requests/$m"
 
-  lazy val GetMergeRequestCommentsUrl =
+  lazy val MergeRequestCommentsUrl =
     (b: String, p: ProjectId, m: MergeRequestId, v: APIVersion) =>
       s"${BaseUrl(b, v)}/projects/$p/merge_requests/$m/notes"
+
+  lazy val GetMergeRequestCommentUrl =
+    (b: String, p: ProjectId, m: MergeRequestId, n: NoteId, v: APIVersion) =>
+      s"${BaseUrl(b, v)}/projects/$p/merge_requests/$m/notes/$n"
 }

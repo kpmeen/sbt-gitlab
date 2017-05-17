@@ -7,7 +7,7 @@ import net.scalytica.gitlab.models.mergerequest.{
   MergeRequestId,
   MergeState
 }
-import net.scalytica.gitlab.models.note.Note
+import net.scalytica.gitlab.models.note.{Note, NoteId}
 
 object MergeRequests {
 
@@ -46,10 +46,30 @@ object MergeRequests {
       implicit client: GitLabClient
   ): Vector[Note] = {
     client.list[Note](
-      Urls.GetMergeRequestCommentsUrl(
+      Urls.MergeRequestCommentsUrl(
         baseUrl,
         projectId,
         mergeRequestId,
+        apiVersion
+      )
+    )
+  }
+
+  def note(
+      baseUrl: String,
+      projectId: ProjectId,
+      mergeRequestId: MergeRequestId,
+      noteId: NoteId,
+      apiVersion: APIVersion
+  )(
+      implicit client: GitLabClient
+  ): Note = {
+    client.get[Note](
+      Urls.GetMergeRequestCommentUrl(
+        baseUrl,
+        projectId,
+        mergeRequestId,
+        noteId,
         apiVersion
       )
     )

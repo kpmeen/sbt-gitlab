@@ -4,7 +4,7 @@ import net.scalytica.gitlab.api.APIVersions._
 import net.scalytica.gitlab.api._
 import net.scalytica.gitlab.models._
 import net.scalytica.gitlab.models.mergerequest._
-import net.scalytica.gitlab.models.note.Note
+import net.scalytica.gitlab.models.note.{Note, NoteId}
 import net.scalytica.gitlab.models.pipeline.{
   Pipeline,
   PipelineDetails,
@@ -64,6 +64,8 @@ object GitLabPlugin extends AutoPlugin {
     val showMergeRequest  = inputKey[Unit]("Show a specific merge request")
     val listMergeRequestNotes =
       inputKey[Unit]("Show notes/comments for a specific merge request")
+    val showMergeRequestNote =
+      inputKey[Unit]("Show a specific merge request note")
 
   }
 
@@ -98,14 +100,10 @@ object GitLabPlugin extends AutoPlugin {
   private val idParser = token(Space) ~> token(NatBasic, "<gitlab project id>")
 
   private val mrStateParser =
-    sbt.complete.Parser
-      .opt(
-        token(Space) ~> token(
-          StringBasic,
-          s"<${MergeState.All.map(_.value).mkString(" | ")}>"
-        )
-      )
-      .map(_.map(MergeState.unsafeFromString))
+    token(Space) ~> token(
+      StringBasic,
+      s"<${MergeState.All.map(_.value).mkString(" | ")}>"
+    ).map(MergeState.unsafeFromString)
 
   private val projectNotFound = (namespace: String) =>
     (name: String) =>
@@ -234,7 +232,7 @@ object GitLabPlugin extends AutoPlugin {
         val log             = streams.value.log
         implicit val client = gitlabClient.value
 
-        val state   = mrStateParser.parsed.getOrElse(NoState)
+        val state   = mrStateParser.??(NoState).parsed
         val project = gitlabProject.value
         val url     = gitlabBaseUrl.value
         val v       = gitlabApiVersion.value
@@ -259,15 +257,15 @@ object GitLabPlugin extends AutoPlugin {
         val log             = streams.value.log
         implicit val client = gitlabClient.value
 
-        val id      = idParser.parsed
-        val mrId    = MergeRequestId(id)
-        val project = gitlabProject.value
-        val url     = gitlabBaseUrl.value
-        val v       = gitlabApiVersion.value
+        val id             = idParser.parsed
+        val mergeRequestId = MergeRequestId(id)
+        val project        = gitlabProject.value
+        val url            = gitlabBaseUrl.value
+        val v              = gitlabApiVersion.value
 
         val res =
           project
-            .map(p => Right(MergeRequests.get(url, p.id, mrId, v)))
+            .map(p => Right(MergeRequests.get(url, p.id, mergeRequestId, v)))
             .getOrElse {
               Left(
                 projectNotFound(gitlabProjectNamespace.value)(
@@ -285,15 +283,15 @@ object GitLabPlugin extends AutoPlugin {
         val log             = streams.value.log
         implicit val client = gitlabClient.value
 
-        val id      = idParser.parsed
-        val mrId    = MergeRequestId(id)
-        val project = gitlabProject.value
-        val url     = gitlabBaseUrl.value
-        val v       = gitlabApiVersion.value
+        val id             = idParser.parsed
+        val mergeRequestId = MergeRequestId(id)
+        val project        = gitlabProject.value
+        val url            = gitlabBaseUrl.value
+        val v              = gitlabApiVersion.value
 
         val res =
           project
-            .map(p => Right(MergeRequests.notes(url, p.id, mrId, v)))
+            .map(p => Right(MergeRequests.notes(url, p.id, mergeRequestId, v)))
             .getOrElse {
               Left(
                 projectNotFound(gitlabProjectNamespace.value)(
@@ -305,6 +303,33 @@ object GitLabPlugin extends AutoPlugin {
         res match {
           case Right(notes) => Note.prettyPrint(notes)
           case Left(err)    => log.warn(err)
+        }
+      },
+      showMergeRequestNote := {
+        val log             = streams.value.log
+        implicit val client = gitlabClient.value
+
+        val (mid, nid)     = (idParser ~ idParser).parsed
+        val mergeRequestId = MergeRequestId(mid)
+        val noteId         = NoteId(nid)
+        val project        = gitlabProject.value
+        val url            = gitlabBaseUrl.value
+        val v              = gitlabApiVersion.value
+
+        val res =
+          project.map { p =>
+            Right(MergeRequests.note(url, p.id, mergeRequestId, noteId, v))
+          }.getOrElse {
+            Left(
+              projectNotFound(gitlabProjectNamespace.value)(
+                gitlabProjectName.value
+              )
+            )
+          }
+
+        res match {
+          case Right(note) => Note.prettyPrint(note)
+          case Left(err)   => log.warn(err)
         }
       }
     )

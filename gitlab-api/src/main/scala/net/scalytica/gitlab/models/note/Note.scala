@@ -60,4 +60,21 @@ object Note {
     println(table)
   }
 
+  def prettyPrint(note: Note): Unit = {
+    println(
+      s"""
+       |---------------------- NOTE ------------------------
+       |id       : ${note.id}
+       |author   : ${note.author.user.username}
+       |created  : ${note.createdAt}
+       |updated  : ${note.updatedAt.getOrElse("-")}
+       |by system: ${note.system}
+       |note for : ${note.noteableType} with id ${note.noteableId}
+       |body     :
+       |${note.body.split("\n").map(l => s"  $l").mkString("")}
+       |----------------------------------------------------
+      """.stripMargin
+    )
+  }
+
 }

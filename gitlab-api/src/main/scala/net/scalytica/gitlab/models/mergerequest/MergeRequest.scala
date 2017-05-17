@@ -73,9 +73,6 @@ object MergeRequest {
     "comments"
   )
 
-  private val hf =
-    s"""----------------------------------------------------""".stripMargin
-
   def prettyPrint(mr: MergeRequest): Unit = {
     val branchesTable = TablePrinter.format(
       Seq(
@@ -86,7 +83,7 @@ object MergeRequest {
     )
     val out =
       s"""
-         !$hf
+         !----------------- MERGE REQUEST --------------------
          !id              : ${mr.id}
          !iid             : ${mr.iid}
          !project id      : ${mr.projectId}
@@ -100,9 +97,9 @@ object MergeRequest {
          !merge on success: ${mr.mergeWhenPipelineSucceeds}
          !merge status    : ${mr.mergeStatus.getOrElse("")}
          !number of notes : ${mr.userNotesCount}
-         !branches
+         !branches        :
          !$branchesTable
-         !$hf
+         !----------------------------------------------------
        """
       // Need to use a different margin character because of the ASCII table
         .stripMargin('!')
