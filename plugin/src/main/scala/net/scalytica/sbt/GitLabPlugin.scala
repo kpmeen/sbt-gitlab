@@ -76,7 +76,7 @@ object GitLabPlugin extends AutoPlugin {
   lazy val gitlabClient =
     Def.setting(GitLabClient(AccessToken(gitlabAuthToken.value)))
 
-  lazy val gitlabProject: Def.Initialize[Option[GitlabProject]] =
+  lazy val gitlabProject: Def.Initialize[Option[GitLabProject]] =
     Def.setting {
       implicit val client = gitlabClient.value
 

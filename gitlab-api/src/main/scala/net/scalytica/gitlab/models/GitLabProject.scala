@@ -9,23 +9,23 @@ import play.api.libs.functional.syntax._
  *
  * @see [[https://gitlab.com/help/api/projects.md#list-projects]]
  */
-case class GitlabProject(
+case class GitLabProject(
     id: ProjectId,
     name: String,
     pathWithNamespace: String
 )
 
-object GitlabProject {
+object GitLabProject {
 
-  implicit val reads: Reads[GitlabProject] = (
+  implicit val reads: Reads[GitLabProject] = (
     (__ \ "id").read[ProjectId] and
       (__ \ "name").read[String] and
       (__ \ "path_with_namespace").read[String]
-  )(GitlabProject.apply _)
+  )(GitLabProject.apply _)
 
   private val headers = Seq("project id", "project name")
 
-  def prettyPrint(projs: Seq[GitlabProject]): Unit = {
+  def prettyPrint(projs: Seq[GitLabProject]): Unit = {
     val t = TablePrinter.format(
       Seq(headers) ++ projs.map(p => Seq(p.id, p.name))
     )
