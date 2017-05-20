@@ -17,7 +17,7 @@ to use the plugin. First of all you need to add the following lines to your
 resolvers += Resolver.bintrayIvyRepo("kpmeen", "sbt-plugins")
 resolvers += Resolver.bintrayRepo("kpmeen", "maven")
 
-addSbtPlugin("net.scalytica" % """sbt-gitlab""" % "0.1.2")
+addSbtPlugin("net.scalytica" % """sbt-gitlab""" % "0.1.3")
 ```
 
 ## Configuration
