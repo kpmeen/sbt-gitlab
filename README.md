@@ -26,22 +26,64 @@ tbd...
 
 ## Tasks
 
-List executed pipelines for the configured project 
-```
+#### Pipelines
+
+List executed pipelines for the configured project
+
+```scala
 listPipelines
 ```
 
 Retry a specific pipeline
-```
+
+```scala
 retryPipeline <pipeline ID>
 ```
 
 Show a specific pipeline
-```
+
+```scala
 showPipeline  <pipeline ID>
 ```
 
 Cancel an pipeline that is `pending` / `running`
-```
+
+```scala
 cancelPipeline  <pipeline ID>
+```
+
+#### Merge Requests
+
+List merge requests for the configured project. It's possible to provide a filter for merge request status.
+
+```scala
+// list all MR's
+listMergeRequests 
+
+// list all opened MR's
+listMergeRequests opened
+
+// list all closed MR's
+listMergeRequests closed
+
+// list all merged MR's
+listMergeRequests merged
+```
+
+Show a specific merge request
+
+```scala
+showMergeRequest <merge request IID>
+```
+
+Show notes/comments for a specific merge request
+
+```scala
+listMergeRequestNotes <merge request IID>
+```
+
+Show a specific merge request note
+
+```scala
+showMergeRequestNote <merge request IID> <note ID>
 ```
