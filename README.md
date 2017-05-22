@@ -22,7 +22,19 @@ addSbtPlugin("net.scalytica" % """sbt-gitlab""" % "0.1.3")
 
 ## Configuration
 
-tbd...
+The following keys are available to configure the plugin:
+
+```scala
+// Settings keys to configure the plugin
+val gitlabAuthToken = settingKey[String]("Personal GitLab access token.")
+val gitlabUseTLS = settingKey[Boolean]("Whether or not to use HTTP or HTTPS when communicating with the GitLab API.")
+val gitlabHost = settingKey[String]("The hostname for the GitLab instance. Defaults to gitlab.com.")
+val gitlabApiVersion = settingKey[APIVersion]("The API version to use. Defaults to v4.")
+val gitlabBaseUrl = settingKey[String]("The base URL for the GitLab API.")
+val gitlabProjectNamespace = settingKey[String]("The GitLab namespace for this project. The namespace is typically the name of the repos owner.")
+val gitlabProjectOwnerIsUser = settingKey[Boolean]("Whether or not the project owner is a group or a user. Defaults to true, owned by user.")
+val gitlabProjectName = settingKey[String]("The GitLab repo name. Defaults to this projects name.")
+```
 
 ## Tasks
 

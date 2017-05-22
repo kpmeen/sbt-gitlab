@@ -33,24 +33,18 @@ object GitLabPlugin extends AutoPlugin {
     val gitlabHost = settingKey[String](
       "The hostname for the GitLab instance. Defaults to gitlab.com."
     )
-    val gitlabApiVersion = settingKey[APIVersion](
-      "The API version to use. Defaults to v4."
-    )
+    val gitlabApiVersion =
+      settingKey[APIVersion]("The API version to use. Defaults to v4.")
     val gitlabBaseUrl = settingKey[String]("The base URL for the GitLab API.")
     val gitlabProjectNamespace = settingKey[String](
-      "The GitLab namespace for this project. The namespace is typically the " +
-        "name of the repos owner."
+      "The GitLab namespace for this project. The namespace is typically the name of the repos owner."
     )
     val gitlabProjectOwnerIsUser = settingKey[Boolean](
-      "Whether or not the project owner is a group or a user. Defaults to true," +
-        " owned by user,"
+      "Whether or not the project owner is a group or a user. Defaults to true, owned by user."
     )
     val gitlabProjectName = settingKey[String](
       "The GitLab repo name. Defaults to this projects name."
     )
-
-    val gitlabClient =
-      settingKey[GitLabClient]("HTTP Client used to communicate with GitLab")
 
   }
 
